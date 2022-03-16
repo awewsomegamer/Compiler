@@ -43,14 +43,52 @@ Image from Shutterstock
 
 ## Instructions
 <pre>
+Definitions of symbols:
+  x -> register / value
+  y -> register / value
+  to -> to register / label
+  from -> from register / label
+  
 mov to, from
+
 sub x, y (ax = x - y)
+
 add x, y (ax = x + y)
+
 div x, y (ax = x / y)
+
 mul x, y (ax = x * y)
+
+and x, y (x = x & y)
+
+or x, y (x = x | y)
+
+xor x, y (x = x ^ y)
+
+not x (x = ~x)
+
 shl value, by (value << by) -> Shift left
+
 shr value, by (value >> by) -> Shift right
-.
-.
-.
+
+int x -> Triggers interrupt of value x
+
+call label / address -> Executes code at that label / address
+
+jmp label / address -> jumps to the give label / address and proceeds execution from there
+
+cmp x, y -> compares x to y
+
+je label / address -> Jumps to label / address if equal flag is set
+
+jne label / address -> Jumps to label / address if equal flag is not set
+
+jz label / address -> Jumps to label / address if zero flag is set
+
+jnz label / address -> Jumps to label / address if zero flag is not set
+
+jc label / address -> Jumps to label / address if carry flag is set
+
+jnc label / address -> Jumps to label / address if carry flag is not set
+
 </pre>
