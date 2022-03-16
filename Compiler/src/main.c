@@ -1,7 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "util.h"
 #include <assert.h>
+
+#include <util.h>
+#include <types.h>
+#include <lexer.h>
 
 #define LINE_SIZE 256
 
@@ -22,6 +25,9 @@ int main(int argc, char* argv[]){
 	char line[LINE_SIZE];
 	char* line_clean = malloc(LINE_SIZE);
 
+	LIST_T* head = (LIST_T*)malloc(sizeof(LIST_T));
+	LIST_T* current = head;
+
 	while (fgets(line, sizeof(line), in_file)){
 		memset(line_clean, 0, LINE_SIZE);
 
@@ -40,9 +46,17 @@ int main(int argc, char* argv[]){
 
 		memset((line_clean + semcol_index), 0, (LINE_SIZE-semcol_index));
 
-		// lex clean line
-		printf("%s",line_clean);
+		current->value = tokenize(line_clean);
+
+		LIST_T* next = (LIST_T*)malloc(sizeof(LIST_T));
+		current->next = next;
+
+		current = next;
+
+		printf("%s\n",line_clean);
 	}
+
+	printf("%d\n",head->value.operation);
 
 	free(line_clean);
 

@@ -1,6 +1,6 @@
 CSTUFF := $(wildcard *.c)
 CC := gcc
-CFLAGS := 
+CFLAGS := -I ./include/ 
 
 all: $(OSTUFF) 
 	$(CC) $(CFLAGS) $(CSTUFF) -o ../compiler.out

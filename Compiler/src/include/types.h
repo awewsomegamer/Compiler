@@ -27,6 +27,19 @@ typedef enum {
 		SHR = 7,
 		INT = 8,
 		ENDFILE = -1
-} OPERATION;
+} OPERATION_T;
+
+typedef struct {
+	OPERATION_T operation;
+	uint16_t value1;
+	uint16_t value2;
+} TOKEN_T;
+
+struct LIST {
+	TOKEN_T value;
+	struct LIST* next;
+};
+typedef struct LIST LIST_T;
+
 
 #endif
