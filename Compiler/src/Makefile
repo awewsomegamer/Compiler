@@ -3,5 +3,5 @@ CC := gcc
 CFLAGS := 
 
 all: $(OSTUFF) 
-	$(CC) $(CFLAGS) $(CSTUFF) -o ../compiler
+	$(CC) $(CFLAGS) $(CSTUFF) -o ../compiler.out
 	
