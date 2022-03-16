@@ -6,6 +6,10 @@ This is a small compiler that is supposed to be assembly like. The name of the c
 Image from Shutterstock
 
 ## Architecture
+Bytes are organized in this fashion
+<pre>OPERATION CODE, VALUE 1, VALUE 2</pre>
+All bytes result in a value that is greater than or equal to 0, the only time a byte will be -1 is when the end of the program is reached.
+
 <pre>
 |Registers:
 |        +- AH (higher 8 bits)
