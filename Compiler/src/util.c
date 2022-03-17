@@ -11,22 +11,31 @@ bool startsWith(const char* str, const char* lookfor){
 void removeCharacter(char* line, char c){
 	int contains_c = 0;
 
-	for (int i = 0; i < strlen(line); i++)
-		if (*(line + i) == c)
+	for (int i = 0; i < strlen(line); i++) {
+		if (*(line + i) == c){
 			contains_c = 1;
+			break;
+		}
+	}
 
 	if (contains_c){
 		char* tmp = malloc(strlen(line));
 		memcpy(tmp, line, strlen(line));
+		memset(line, 0, strlen(tmp));
 
 		int line_clean_i = 0;
-		for (int i = 0; i < LINE_SIZE; i++){
+		for (int i = 0; i < strlen(tmp); i++){
+			printf("%c", *(tmp + i));
+
 			if (*(tmp + i) != c){
 				*(line + line_clean_i) = *(tmp + i);
 				line_clean_i++;
 			}
 		}
 
-		free(tmp);
+		printf("\n");
+
+		memset(tmp, 0, strlen(tmp));
+//		free(tmp);
 	}
 }
