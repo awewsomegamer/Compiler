@@ -5,7 +5,7 @@
 TOKEN_T tokenize(char* line){
 	TOKEN_T result = {ENDFILE,0,0};
 
-	if (*line != '\0'){
+	if (strlen(line) > 1){
 		int space_indices[LINE_SIZE];
 
 //		size_t space_count = 0;
@@ -30,7 +30,7 @@ TOKEN_T tokenize(char* line){
 //
 //		printf("\n");
 
-		char* sections[space_index+1];
+		char* sections[space_index+1][strlen(line)];
 		char* section_buffer = malloc(LINE_SIZE);
 
 		int last_index = 0;
@@ -39,11 +39,14 @@ TOKEN_T tokenize(char* line){
 			memcpy(section_buffer, line+last_index,  space_indices[i]-last_index);
 			last_index = space_indices[i];
 
+			printf("%s\n", section_buffer);
 			removeCharacter(section_buffer, ' ');
+			printf("%s\n", section_buffer);
 			removeCharacter(section_buffer, ',');
+			printf("%s\n\n", section_buffer);
 
-			sections[i] = section_buffer;
-			memset(section_buffer, 0, sizeof(section_buffer));
+			strcpy(sections+i, section_buffer);
+			memset(section_buffer, 0, LINE_SIZE);
 		}
 
 		memcpy(section_buffer, line+last_index, strlen(line)-last_index);
@@ -52,11 +55,13 @@ TOKEN_T tokenize(char* line){
 		removeCharacter(section_buffer, ' ');
 		removeCharacter(section_buffer, ',');
 
-		sections[i] = section_buffer;
-		memset(section_buffer, 0, sizeof(section_buffer));
+		strcpy(sections+i, section_buffer);
+		memset(section_buffer, 0, LINE_SIZE);
 
-//		printf("%s", sections[0]);
-
+//		for (i = 0; i < space_index+1; i++)
+//			printf("%s\n", sections[i]);
+//		free(sections);
+//		free(section_buffer);
 
 //		printf("%d :: %s\n", space_count,line);
 //

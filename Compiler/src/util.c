@@ -9,16 +9,24 @@ bool startsWith(const char* str, const char* lookfor){
 }
 
 void removeCharacter(char* line, char c){
-	char* tmp = malloc(sizeof(line));
-	memcpy(tmp, line, sizeof(line));
+	int contains_c = 0;
 
-	int line_clean_i = 0;
-	for (int i = 0; i < LINE_SIZE; i++){
-		if (*(tmp + i) != c){
-			*(line + line_clean_i) = *(tmp + i);
-			line_clean_i++;
+	for (int i = 0; i < strlen(line); i++)
+		if (*(line + i) == c)
+			contains_c = 1;
+
+	if (contains_c){
+		char* tmp = malloc(strlen(line));
+		memcpy(tmp, line, strlen(line));
+
+		int line_clean_i = 0;
+		for (int i = 0; i < LINE_SIZE; i++){
+			if (*(tmp + i) != c){
+				*(line + line_clean_i) = *(tmp + i);
+				line_clean_i++;
+			}
 		}
-	}
 
-	free(tmp);
+		free(tmp);
+	}
 }
