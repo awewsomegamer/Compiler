@@ -20,22 +20,18 @@ void removeCharacter(char* line, char c){
 
 	if (contains_c){
 		char* tmp = malloc(strlen(line));
-		memcpy(tmp, line, strlen(line));
+		strcpy(tmp, line);
 		memset(line, 0, strlen(tmp));
 
 		int line_clean_i = 0;
 		for (int i = 0; i < strlen(tmp); i++){
-			printf("%c", *(tmp + i));
-
 			if (*(tmp + i) != c){
 				*(line + line_clean_i) = *(tmp + i);
 				line_clean_i++;
 			}
 		}
 
-		printf("\n");
-
 		memset(tmp, 0, strlen(tmp));
-//		free(tmp);
+		free(tmp);
 	}
 }

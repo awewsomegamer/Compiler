@@ -39,11 +39,8 @@ TOKEN_T tokenize(char* line){
 			memcpy(section_buffer, line+last_index,  space_indices[i]-last_index);
 			last_index = space_indices[i];
 
-			printf("%s\n", section_buffer);
 			removeCharacter(section_buffer, ' ');
-			printf("%s\n", section_buffer);
 			removeCharacter(section_buffer, ',');
-			printf("%s\n\n", section_buffer);
 
 			strcpy(sections+i, section_buffer);
 			memset(section_buffer, 0, LINE_SIZE);
@@ -58,8 +55,10 @@ TOKEN_T tokenize(char* line){
 		strcpy(sections+i, section_buffer);
 		memset(section_buffer, 0, LINE_SIZE);
 
-//		for (i = 0; i < space_index+1; i++)
-//			printf("%s\n", sections[i]);
+		for (i = 0; i < space_index+1; i++)
+			printf("%s : ", sections[i]);
+		printf("\n");
+
 //		free(sections);
 //		free(section_buffer);
 
