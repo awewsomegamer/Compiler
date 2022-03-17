@@ -5,5 +5,6 @@
 #include <string.h>
 
 bool startsWith(const char* str, const char* lookfor);
+void removeCharacter(char* line, char c);
 
 #endif

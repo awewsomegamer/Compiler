@@ -2,11 +2,10 @@
 #include <stdio.h>
 #include <assert.h>
 
+#include <global.h>
 #include <util.h>
 #include <types.h>
 #include <lexer.h>
-
-#define LINE_SIZE 256
 
 int main(int argc, char* argv[]){
 	FILE* in_file;
@@ -23,42 +22,29 @@ int main(int argc, char* argv[]){
 	assert(in_file != NULL);
 
 	char line[LINE_SIZE];
-	char* line_clean = malloc(LINE_SIZE);
 
 	LIST_T* head = (LIST_T*)malloc(sizeof(LIST_T));
 	LIST_T* current = head;
 
 	while (fgets(line, sizeof(line), in_file)){
-		memset(line_clean, 0, LINE_SIZE);
-
-		int line_clean_i = 0;
-		for (int i = 0; i < LINE_SIZE; i++){
-			if (line[i] != '\t'){
-				*(line_clean+line_clean_i) = line[i];
-				line_clean_i++;
-			}
-		}
+		removeCharacter(line, '\t');
 
 		int semcol_index = 0;
 		for (; semcol_index < LINE_SIZE; semcol_index++)
-			if (*(line_clean+semcol_index) == ';')
+			if (*(line+semcol_index) == ';')
 				break;
 
-		memset((line_clean + semcol_index), 0, (LINE_SIZE-semcol_index));
+		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));
 
-		current->value = tokenize(line_clean);
+		current->value = tokenize(line);
 
 		LIST_T* next = (LIST_T*)malloc(sizeof(LIST_T));
 		current->next = next;
 
 		current = next;
-
-		printf("%s\n",line_clean);
 	}
 
 	printf("%d\n",head->value.operation);
-
-	free(line_clean);
 
 	// compiler
 	// output
