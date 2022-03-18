@@ -93,7 +93,7 @@ TOKEN_T tokenize(char* line){
 					value = *(sections[i]+1);
 				}else if (startsWith(sections[i+1], "0x")){
 					// Hex
-					value = strToHex(sections[i+1]);
+					value = strtol(sections[i+1], NULL, 16);
 				}else if (startsWith(sections[i+1], "0b")){
 					// Binary
 					value = strToBinary(sections[i+1]);
