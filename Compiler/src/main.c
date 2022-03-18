@@ -26,6 +26,14 @@ int main(int argc, char* argv[]){
 	LIST_T* head = (LIST_T*)malloc(sizeof(LIST_T));
 	LIST_T* current = head;
 
+//	LIST_T* labels_head = (LIST_T*)malloc(sizeof(LIST_T));
+//	LIST_T* labels_current = labels_head;
+//
+//	LIST_T* labels_value_head = (LIST_T*)malloc(sizeof(LIST_T));
+//	LIST_T* labels_value_current = labels_value_head;
+//
+//	int address_count = 0;
+
 	while (fgets(line, sizeof(line), in_file)){
 		removeCharacter(line, '\t');
 
@@ -42,11 +50,13 @@ int main(int argc, char* argv[]){
 		current->next = next;
 
 		current = next;
+
+//		address_count += 3;
 	}
 
 	current = head;
 	while (current->next != NULL){
-		printf("%d\n",current->value.operation);
+		printf("%d : %d : %d\n",current->value.operation, current->value.value1, current->value.value2);
 		current = current->next;
 	}
 

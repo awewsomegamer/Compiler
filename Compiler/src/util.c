@@ -1,5 +1,6 @@
 #include <util.h>
 #include <global.h>
+#include <ctype.h>
 
 bool startsWith(const char* str, const char* lookfor){
 	if (strncmp(str, lookfor, strlen(lookfor)) == 0)
@@ -17,6 +18,23 @@ bool containsCharacter(char* line, char c){
 			break;
 		}
 	}
+}
+
+// 0b included
+int strToBinary(char* line){
+	int result = 0;
+
+	int multiplier = 1;
+	for (size_t i = strlen(line)-1; i >= 2; i--){
+		if (i <= 0) break;
+
+		if (*(line+i) == '1')
+			result += multiplier;
+
+		multiplier *= 2;
+	}
+
+	return result/2;
 }
 
 void removeCharacter(char* line, char c){

@@ -2,8 +2,39 @@
 #include <global.h>
 #include <util.h>
 
+REGISTER_T indexRegister(char* name){
+	for (int i = 0; i < sizeof(REGISTER_T_NAMES)/sizeof(REGISTER_T_NAMES[0]); i++){
+		if (strcmp(name, REGISTER_T_NAMES[i]) == 0){
+			// Ending
+			// X = FULL
+			// L = /2
+			// H = -1
+
+			int index = i/3+1;
+
+			// ABCD register
+			if (index < 5){
+				index *= 0x10;
+
+				switch((int)*(name+1)){
+				case 'x': return index;
+				case 'l': return index/2;
+				case 'h': return index-1;
+				}
+			}
+
+			if (index >= 5)
+				return index*0x10;
+
+			break;
+		}
+	}
+
+	return -1;
+}
+
 TOKEN_T tokenize(char* line){
-	TOKEN_T result = {ENDFILE,0,0};
+	TOKEN_T result = {NOP,NOP,NOP};
 
 	if (strlen(line) > 1){
 		int space_indices[LINE_SIZE];
@@ -48,6 +79,36 @@ TOKEN_T tokenize(char* line){
 				result.operation = i;
 				break;
 			}
+		}
+
+		// Index values
+		for (int i = 0; i < space_index; i++){
+			int value = indexRegister(sections[i+1]);
+
+			if (value == -1){
+				// Check if section is reffering plain value (int, char, etc...)
+
+				if (*(sections[i+1]) == '\''){
+					// Char
+					value = *(sections[i]+1);
+				}else if (startsWith(sections[i+1], "0x")){
+					// Hex
+					value = strToHex(sections[i+1]);
+				}else if (startsWith(sections[i+1], "0b")){
+					// Binary
+					value = strToBinary(sections[i+1]);
+				}else{
+					// Integer
+					value = atoi(sections[i+1]);
+				}
+				// Otherwise get address of label if section does not start with '[' and end with ']'
+				// When label starts with '[' and ends with ']' return value of label
+			}
+
+			if (i == 0)
+				result.value1 = value;
+			else if (i == 1)
+				result.value2 = value;
 		}
 	}
 

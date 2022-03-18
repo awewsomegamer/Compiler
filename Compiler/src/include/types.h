@@ -2,21 +2,27 @@
 #define TYPES_H
 
 // These are pointers
-#define A 0x10 // (AH = A & 0xF0) (AL = A & 0x0F) (ptr AX = A) (ptr AL = A - 0x08)
-#define B 0x20 // (AH = A & 0xF0) (AL = A & 0x0F) (ptr AX = A) (ptr AL = A - 0x08)
-#define C 0x30
-#define D 0x40
-#define IP 0x50
-#define SP 0x60
-#define BP 0x70
-#define I1 0x80
-#define I2 0x90
-#define I3 0x100
-#define I4 0x110
+// (AH = A & 0xF0) (AL = A & 0x0F) (ptr AX = A) (ptr AL = A - 0x08)
+// (AH = A & 0xF0) (AL = A & 0x0F) (ptr AX = A) (ptr AL = A - 0x08)
 
 #include <stdint.h>
 
-static const char* OPERATION_T_NAMES[] = {"nop", "mov", "sub", "add", "div", "mul", "and", "or", "xor", "not", "shl", "shr", "int", "call", "jmp", "cmp", "je", "jne", "jz", "jnz", "jc", "jnc"};
+static const char* REGISTER_T_NAMES[] = {"ax", "al", "ah", "bx", "bl", "bh", "cx", "cl", "ch","dx", "dl", "dh", "ip", "sp", "bp", "i1", "i2", "i3", "i4"};
+typedef enum {
+	A = 0x10,
+	B = 0x20,
+	C = 0x30,
+	D = 0x40,
+	IP = 0x50,
+	SP = 0x60,
+	BP = 0x70,
+	I1 = 0x80,
+	I2 = 0x90,
+	I3 = 0x100,
+	I4 = 0x110
+} REGISTER_T;
+
+static const char* OPERATION_T_NAMES[] = {"nop", "mov", "sub", "add", "div", "mul", "and", "or", "xor", "not", "shl", "shr", "int", "call", "jmp", "cmp", "je", "jne", "jz", "jnz", "jc", "jnc", "ret"};
 typedef enum {
 		NOP = 0,
 		MOV = 1,
@@ -40,13 +46,14 @@ typedef enum {
 		JNZ = 19,
 		JC = 20,
 		JNC = 21,
+		RET = 22,
 		ENDFILE = -1
 } OPERATION_T;
 
 typedef struct {
 	OPERATION_T operation;
-	uint16_t value1;
-	uint16_t value2;
+	uint32_t value1;
+	uint32_t value2;
 } TOKEN_T;
 
 struct LIST {
