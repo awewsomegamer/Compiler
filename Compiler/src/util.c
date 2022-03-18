@@ -8,7 +8,7 @@ bool startsWith(const char* str, const char* lookfor){
 	return false;
 }
 
-void removeCharacter(char* line, char c){
+bool containsCharacter(char* line, char c){
 	int contains_c = 0;
 
 	for (int i = 0; i < strlen(line); i++) {
@@ -17,8 +17,10 @@ void removeCharacter(char* line, char c){
 			break;
 		}
 	}
+}
 
-	if (contains_c){
+void removeCharacter(char* line, char c){
+	if (containsCharacter(line, c)){
 		char* tmp = malloc(strlen(line));
 		strcpy(tmp, line);
 		memset(line, 0, strlen(tmp));

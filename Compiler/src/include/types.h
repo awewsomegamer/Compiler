@@ -41,5 +41,4 @@ struct LIST {
 };
 typedef struct LIST LIST_T;
 
-
 #endif
