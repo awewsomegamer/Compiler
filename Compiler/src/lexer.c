@@ -41,11 +41,14 @@ TOKEN_T tokenize(char* line){
 		strcpy(sections+i, section_buffer);
 		memset(section_buffer, 0, LINE_SIZE);
 
-		for (i = 0; i < space_index+1; i++)
-			printf("%s : ", sections[i]);
-		printf("\n");
+		// Operations and registers can only be lowercase
 
-		free(section_buffer);
+		for (int i = 0; i< sizeof(OPERATION_T_NAMES)/sizeof(OPERATION_T_NAMES[0]); i++){
+			if (strcmp(sections[0], OPERATION_T_NAMES[i]) == 0){
+				result.operation = i;
+				break;
+			}
+		}
 	}
 
 	return result;

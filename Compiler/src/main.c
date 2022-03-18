@@ -44,7 +44,11 @@ int main(int argc, char* argv[]){
 		current = next;
 	}
 
-	printf("%d\n",head->value.operation);
+	current = head;
+	while (current->next != NULL){
+		printf("%d\n",current->value.operation);
+		current = current->next;
+	}
 
 	// compiler
 	// output

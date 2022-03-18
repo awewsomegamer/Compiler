@@ -16,6 +16,7 @@
 
 #include <stdint.h>
 
+static const char* OPERATION_T_NAMES[] = {"nop", "mov", "sub", "add", "div", "mul", "and", "or", "xor", "not", "shl", "shr", "int", "call", "jmp", "cmp", "je", "jne", "jz", "jnz", "jc", "jnc"};
 typedef enum {
 		NOP = 0,
 		MOV = 1,
@@ -23,9 +24,22 @@ typedef enum {
 		ADD = 3,
 		DIV = 4,
 		MUL = 5,
-		SHL = 6,
-		SHR = 7,
-		INT = 8,
+		AND = 6,
+		OR = 7,
+		XOR = 8,
+		NOT = 9,
+		SHL = 10,
+		SHR = 11,
+		INT = 12,
+		CALL = 13,
+		JMP = 14,
+		CMP = 15,
+		JE = 16,
+		JNE = 17,
+		JZ = 18,
+		JNZ = 19,
+		JC = 20,
+		JNC = 21,
 		ENDFILE = -1
 } OPERATION_T;
 
