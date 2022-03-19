@@ -7,7 +7,7 @@ Image from Shutterstock
 
 ## Architecture
 Bytes are organized in this fashion
-<pre>OPERATION CODE, VALUE 1, VALUE 2</pre>
+<pre>OPERATION CODE (8 bits), REGISTER MASK (8 bits), VALUE 1 (32 bits), VALUE 2 (32 bits)</pre>
 All bytes result in a value that is greater than or equal to 0, the only time a byte will be -1 is when the end of the program is reached.
 
 <pre>
