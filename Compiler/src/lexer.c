@@ -82,10 +82,16 @@ TOKEN_T tokenize(char* line){
 		}
 
 		// Index values
+		// -1 = none, 0 = first value, 1 = second value, 2 = both values
+		int register_indices = -1;
+
 		for (int i = 0; i < space_index; i++){
 			int value = indexRegister(sections[i+1]);
 
 			if (value == -1){
+				if (register_indices == -1) register_indices = i-1;
+				else register_indices++;
+
 				// Check if section is reffering plain value (int, char, etc...)
 
 				if (*(sections[i+1]) == '\''){
@@ -110,6 +116,8 @@ TOKEN_T tokenize(char* line){
 			else if (i == 1)
 				result.value2 = value;
 		}
+
+		result.operation |= register_indices << 8;
 	}
 
 	return result;

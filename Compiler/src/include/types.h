@@ -62,4 +62,9 @@ struct LIST {
 };
 typedef struct LIST LIST_T;
 
+typedef struct LABEL_T{
+	uint32_t address;
+	char* name;
+};
+
 #endif

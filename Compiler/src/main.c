@@ -35,8 +35,15 @@ int main(int argc, char* argv[]){
 //
 //	LIST_T* labels_value_head = (LIST_T*)malloc(sizeof(LIST_T));
 //	LIST_T* labels_value_current = labels_value_head;
-//
+
 //	int address_count = 0;
+//
+//	while (fgets(line, sizeof(line), in_file)){
+//
+//	}
+
+	// Read file, detect labels, note down their address, name, and value into an array
+	// Lexer uses data of labels to fill in the references of labels in code
 
 	while (fgets(line, sizeof(line), in_file)){
 		removeCharacter(line, '\t');
@@ -72,6 +79,10 @@ int main(int argc, char* argv[]){
 	current = head;
 	while (current->next != NULL){
 		printf("%d : %d : %d\n",current->value.operation, current->value.value1, current->value.value2);
+
+		uint16_t operation = current->value.operation;
+		uint32_t v1 = current->value.value1;
+		uint32_t v2 = current->value.value2;
 
 		putw((int)current->value.operation, out_file);
 		putw((int)current->value.value1, out_file);
