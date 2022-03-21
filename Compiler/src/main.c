@@ -81,8 +81,8 @@ int main(int argc, char* argv[]){
 		printf("%d : %d : %d\n",current->value.operation, current->value.value1, current->value.value2);
 
 		uint16_t operation = current->value.operation;
-		uint32_t v1 = current->value.value1;
-		uint32_t v2 = current->value.value2;
+		uint16_t v1 = current->value.value1;
+		uint16_t v2 = current->value.value2;
 
 		putw((int)current->value.operation, out_file);
 		putw((int)current->value.value1, out_file);

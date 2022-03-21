@@ -52,8 +52,8 @@ typedef enum {
 
 typedef struct {
 	OPERATION_T operation;
-	uint32_t value1;
-	uint32_t value2;
+	uint16_t value1;
+	uint16_t value2;
 } TOKEN_T;
 
 struct LIST {

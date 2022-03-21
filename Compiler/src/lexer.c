@@ -82,14 +82,14 @@ TOKEN_T tokenize(char* line){
 		}
 
 		// Index values
-		// -1 = none, 0 = first value, 1 = second value, 2 = both values
-		int register_indices = -1;
+		// 0 = none, 1 = first value, 2 = second value, 3 = both values
+		int register_indices = 0;
 
 		for (int i = 0; i < space_index; i++){
 			int value = indexRegister(sections[i+1]);
 
 			if (value == -1){
-				if (register_indices == -1) register_indices = i-1;
+				if (register_indices == 0) register_indices = i+1;
 				else register_indices++;
 
 				// Check if section is reffering plain value (int, char, etc...)
