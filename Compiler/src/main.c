@@ -9,41 +9,77 @@
 
 int main(int argc, char* argv[]){
 	FILE* in_file;
-	FILE* out_file;
-
 	char* in_file_name = malloc(LINE_SIZE);
+	bool in_file_set = false;
+
+	FILE* out_file;
+	bool out_file_set = false;
+
 
 	for (int i = 1; i < argc; i++){
-		if (startsWith(argv[i], "-o"))
+		if (startsWith(argv[i], "-o")){
 			out_file = fopen(argv[i+1], "w");
+			out_file_set = true;
+		}
 
 		if (startsWith(argv[i], "-i")){
 			in_file = fopen(argv[i+1], "r");
 			strcpy(in_file_name, argv[i+1]);
+			in_file_set = true;
 		}
 	}
 
-	assert(in_file != NULL);
+	assert(in_file_set == true);
+
+	fseek(in_file, 0, SEEK_END);
+	long file_length = ftell(in_file);
+	rewind(in_file);
 
 	char line[LINE_SIZE];
 
-	LIST_T* head = (LIST_T*)malloc(sizeof(LIST_T));
-	LIST_T* current = head;
+	int address_count = 0; // Measured in 4 bytes (each instruction is a 32 bit int)
 
-//	LIST_T* labels_head = (LIST_T*)malloc(sizeof(LIST_T));
-//	LIST_T* labels_current = labels_head;
-//
-//	LIST_T* labels_value_head = (LIST_T*)malloc(sizeof(LIST_T));
-//	LIST_T* labels_value_current = labels_value_head;
+	HASHMAP_ELEMENT_T label_map[file_length];
 
-//	int address_count = 0;
-//
-//	while (fgets(line, sizeof(line), in_file)){
-//
-//	}
+	// LIST_T* labels_list_head = (LIST_T*)malloc(sizeof(LIST_T));
+
+	while (fgets(line, sizeof(line), in_file)){
+		removeCharacter(line, '\t');
+		removeCharacter(line, '\n');
+		removeCharacter(line, '\r');
+		removeCharacter(line, ' ');
+
+		int semcol_index = 0;
+		for (; semcol_index < LINE_SIZE; semcol_index++)
+			if (*(line+semcol_index) == ';')
+				break;
+
+		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));
+	
+		if (endsWith(line, ':')){
+			removeCharacter(line, ':');
+			mapPut(label_map, line, address_count, file_length);
+		}
+
+		address_count += 3;
+	}
+
+	// current = labels_list_head;
+
+	// while (current->next != NULL){
+		// printf("%d : %s\n",current->lvalue.address, current->lvalue.name);
+
+		// current = current->next;
+	// }
 
 	// Read file, detect labels, note down their address, name, and value into an array
 	// Lexer uses data of labels to fill in the references of labels in code
+
+	rewind(in_file);
+
+	TOKEN_T instructions[file_length+1];
+
+	int instruction_index = 0;
 
 	while (fgets(line, sizeof(line), in_file)){
 		removeCharacter(line, '\t');
@@ -55,40 +91,36 @@ int main(int argc, char* argv[]){
 
 		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));
 
-		current->value = tokenize(line);
+		instructions[instruction_index] = tokenize(line);
 
-		LIST_T* next = (LIST_T*)malloc(sizeof(LIST_T));
-		current->next = next;
-
-		current = next;
-
-//		address_count += 3;
+		instruction_index++;
 	}
 
 	// compiler
 	// output
 
-	if (out_file == NULL){
+	if (!out_file_set){
 		char* name = malloc(strlen(in_file_name)+4);
 		sprintf(name, "%s.out", in_file_name);
-
+		
 		out_file = fopen(name, "w");
 		free(name);
 	}
 
-	current = head;
-	while (current->next != NULL){
-		printf("%d : %d : %d\n",current->value.operation, current->value.value1, current->value.value2);
+	printf("%d", instruction_index);
+	instruction_index = 0;
+	for (; instruction_index < file_length; instruction_index++){
+		// printf("%d : %d : %d\n",instructions[instruction_index].operation, instructions[instruction_index].value1, instructions[instruction_index].value2);
 
-		uint16_t operation = current->value.operation;
-		uint16_t v1 = current->value.value1;
-		uint16_t v2 = current->value.value2;
+	// 	uint16_t operation = current->value.operation;
+	// 	uint16_t v1 = current->value.value1;
+	// 	uint16_t v2 = current->value.value2;
 
-		putw((int)current->value.operation, out_file);
-		putw((int)current->value.value1, out_file);
-		putw((int)current->value.value2, out_file);
+		putw((int)instructions[instruction_index].operation, out_file);
+		putw((int)instructions[instruction_index].value1, out_file);
+		putw((int)instructions[instruction_index].value2, out_file);
 
-		current = current->next;
+	// 	current = current->next;
 	}
 
 	return 0;

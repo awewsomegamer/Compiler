@@ -1,6 +1,7 @@
 #include <util.h>
 #include <global.h>
 #include <ctype.h>
+#include <types.h>
 
 bool startsWith(const char* str, const char* lookfor){
 	if (strncmp(str, lookfor, strlen(lookfor)) == 0)
@@ -10,14 +11,18 @@ bool startsWith(const char* str, const char* lookfor){
 }
 
 bool containsCharacter(char* line, char c){
-	int contains_c = 0;
+	for (int i = 0; i < strlen(line); i++)
+		if (*(line + i) == c)
+			return true;
 
-	for (int i = 0; i < strlen(line); i++) {
-		if (*(line + i) == c){
-			contains_c = 1;
-			break;
-		}
-	}
+	return false;
+}
+
+bool endsWith(char* line, char c){
+	if (strlen(line) >= 1 && *(line + strlen(line) - 1) == c)
+		return true;
+
+	return false;
 }
 
 // 0b included
@@ -37,6 +42,17 @@ int strToBinary(char* line){
 	return result/2;
 }
 
+uint64_t hashStr(char* str){
+	uint64_t hash = 559669;
+
+	for (int i = 0; i < strlen(str); i++){
+		hash ^= *(str + i);
+		hash *= 1099511628211;
+	}
+
+	return hash;
+}
+
 void removeCharacter(char* line, char c){
 	if (containsCharacter(line, c)){
 		char* tmp = malloc(strlen(line));
@@ -54,4 +70,16 @@ void removeCharacter(char* line, char c){
 		memset(tmp, 0, strlen(tmp));
 		free(tmp);
 	}
+}
+
+void mapPut(HASHMAP_ELEMENT_T map[], char* id, int value, long length){
+	HASHMAP_ELEMENT_T element;
+	element.id = id;
+	element.value = value;
+
+	map[hashStr(id) % length] =  element;
+}
+
+HASHMAP_ELEMENT_T mapGet(HASHMAP_ELEMENT_T map[], char* id, long length){
+	return map[hashStr(id) % length];
 }

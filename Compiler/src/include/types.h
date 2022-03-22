@@ -56,15 +56,21 @@ typedef struct {
 	uint16_t value2;
 } TOKEN_T;
 
+typedef struct{
+	uint32_t address;
+	char* name;
+} LABEL_T;
+
 struct LIST {
 	TOKEN_T value;
 	struct LIST* next;
 };
 typedef struct LIST LIST_T;
 
-typedef struct LABEL_T{
-	uint32_t address;
-	char* name;
-};
+typedef struct {
+	char* id;
+	int value;
+} HASHMAP_ELEMENT_T;
+
 
 #endif

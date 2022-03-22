@@ -107,9 +107,13 @@ TOKEN_T tokenize(char* line){
 					// Integer
 					value = atoi(sections[i+1]);
 				}
-				// Otherwise get address of label if section does not start with '[' and end with ']'
-				// When label starts with '[' and ends with ']' return value of label
 			}
+
+			if (value == -1){
+					
+			}
+			// Otherwise get address of label if section does not start with '[' and end with ']'
+			// When label starts with '[' and ends with ']' return value of label
 
 			if (i == 0)
 				result.value1 = value;
