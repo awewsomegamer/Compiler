@@ -74,7 +74,7 @@ TOKEN_T tokenize(char* line){
 
 		// Operations and registers can only be lowercase
 
-		for (int i = 0; i< sizeof(OPERATION_T_NAMES)/sizeof(OPERATION_T_NAMES[0]); i++){
+		for (int i = 0; i < sizeof(OPERATION_T_NAMES)/sizeof(OPERATION_T_NAMES[0]); i++){
 			if (strcmp(sections[0], OPERATION_T_NAMES[i]) == 0){
 				result.operation = i;
 				break;
@@ -89,7 +89,7 @@ TOKEN_T tokenize(char* line){
 			int value = indexRegister(sections[i+1]);
 
 			if (value == -1){
-				if (register_indices == 0) register_indices = i+1;
+				if (register_indices == 0) register_indices = i;
 				else register_indices++;
 
 				// Check if section is reffering plain value (int, char, etc...)
@@ -109,8 +109,9 @@ TOKEN_T tokenize(char* line){
 				}
 			}
 
+			// Not plain value, check labels
 			if (value == -1){
-					
+				
 			}
 			// Otherwise get address of label if section does not start with '[' and end with ']'
 			// When label starts with '[' and ends with ']' return value of label

@@ -31,8 +31,12 @@ int main(int argc, char* argv[]){
 
 	assert(in_file_set == true);
 
-	fseek(in_file, 0, SEEK_END);
-	long file_length = ftell(in_file);
+	int file_length = 0;
+
+	while (!feof(in_file))
+		if (fgetc(in_file) == '\n')
+			file_length++;
+
 	rewind(in_file);
 
 	char line[LINE_SIZE];
@@ -75,6 +79,7 @@ int main(int argc, char* argv[]){
 	// Read file, detect labels, note down their address, name, and value into an array
 	// Lexer uses data of labels to fill in the references of labels in code
 
+
 	rewind(in_file);
 
 	TOKEN_T instructions[file_length+1];
@@ -107,7 +112,6 @@ int main(int argc, char* argv[]){
 		free(name);
 	}
 
-	printf("%d", instruction_index);
 	instruction_index = 0;
 	for (; instruction_index < file_length; instruction_index++){
 		// printf("%d : %d : %d\n",instructions[instruction_index].operation, instructions[instruction_index].value1, instructions[instruction_index].value2);
