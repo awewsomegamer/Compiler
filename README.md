@@ -10,6 +10,23 @@ Bytes are organized in this fashion
 <pre>OPERATION CODE (8 bits), REGISTER MASK (8 bits), VALUE 1 (32 bits), VALUE 2 (32 bits)</pre>
 All bytes result in a value that is greater than or equal to 0, the only time a byte will be -1 is when the end of the program is reached.
 
+### Register mask values and descriptions
+<pre>
+
++-------+------------------------------------+
+|Number | Description                        |
++-------+------------------------------------+
+|  0    | Both arguments are not registers   |
++-------+------------------------------------+
+|  1    | The first argument is a register   |
++-------+------------------------------------+
+|  2    | The second argument is a register  |
++-------+------------------------------------+
+|  3    | Both arguments are registers       |
++-------+------------------------------------+
+
+</pre>
+
 <pre>
 |Registers:
 |        +- AH (higher 8 bits)
