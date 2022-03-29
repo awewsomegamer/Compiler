@@ -72,14 +72,14 @@ void removeCharacter(char* line, char c){
 	}
 }
 
-void mapPut(HASHMAP_ELEMENT_T map[], char* id, int value, long length){
+void mapPut(HASHMAP_ELEMENT_T map[], char* id, int value){
 	HASHMAP_ELEMENT_T element;
 	element.id = id;
 	element.value = value;
 
-	map[hashStr(id) % length] =  element;
+	map[hashStr(id) % MAX_LABELS] =  element;
 }
 
-HASHMAP_ELEMENT_T mapGet(HASHMAP_ELEMENT_T map[], char* id, long length){
-	return map[hashStr(id) % length];
+HASHMAP_ELEMENT_T mapGet(HASHMAP_ELEMENT_T map[], char* id){
+	return map[hashStr(id) % MAX_LABELS];
 }

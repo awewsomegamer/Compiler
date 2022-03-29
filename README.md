@@ -12,7 +12,6 @@ All bytes result in a value that is greater than or equal to 0, the only time a 
 
 ### Register mask values and descriptions
 <pre>
-
 +-------+------------------------------------+
 |Number | Description                        |
 +-------+------------------------------------+
@@ -24,7 +23,12 @@ All bytes result in a value that is greater than or equal to 0, the only time a 
 +-------+------------------------------------+
 |  3    | Both arguments are registers       |
 +-------+------------------------------------+
-
+|  4    | The first argument is a label      |
++-------+------------------------------------+
+|  5    | The second argument is a label     |
++-------+------------------------------------+
+|  6    | Both arguments are labels          |
++-------+------------------------------------+
 </pre>
 
 <pre>

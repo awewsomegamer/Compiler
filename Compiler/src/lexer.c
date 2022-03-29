@@ -33,7 +33,7 @@ REGISTER_T indexRegister(char* name){
 	return -1;
 }
 
-TOKEN_T tokenize(char* line){
+TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 	TOKEN_T result = {NOP,NOP,NOP};
 
 	if (strlen(line) > 1){
@@ -82,15 +82,15 @@ TOKEN_T tokenize(char* line){
 		}
 
 		// Index values
-		// 0 = none, 1 = first value, 2 = second value, 3 = both values
-		int register_indices = 0;
+		// 0 = none, 1 = first value, 2 = second value, 3 = both values, 4 = first value label, 5 = second value label, 6 = both values are labels
+		int indices = 0;
 
 		for (int i = 0; i < space_index; i++){
 			int value = indexRegister(sections[i+1]);
 
 			if (value == -1){
-				if (register_indices == 0) register_indices = i;
-				else register_indices++;
+				if (indices == 0) indices = i;
+				else indices++;
 
 				// Check if section is reffering plain value (int, char, etc...)
 
@@ -111,7 +111,11 @@ TOKEN_T tokenize(char* line){
 
 			// Not plain value, check labels
 			if (value == -1){
-				
+				if (indices == 0) indices = 4;
+				else indices++;
+
+				HASHMAP_ELEMENT_T label = mapGet(label_map, sections[i+1]);
+				value = label.value;
 			}
 			// Otherwise get address of label if section does not start with '[' and end with ']'
 			// When label starts with '[' and ends with ']' return value of label
@@ -122,7 +126,7 @@ TOKEN_T tokenize(char* line){
 				result.value2 = value;
 		}
 
-		result.operation |= register_indices << 8;
+		result.operation |= indices << 8;
 	}
 
 	return result;

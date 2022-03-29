@@ -15,7 +15,6 @@ int main(int argc, char* argv[]){
 	FILE* out_file;
 	bool out_file_set = false;
 
-
 	for (int i = 1; i < argc; i++){
 		if (startsWith(argv[i], "-o")){
 			out_file = fopen(argv[i+1], "w");
@@ -43,7 +42,7 @@ int main(int argc, char* argv[]){
 
 	int address_count = 0; // Measured in 4 bytes (each instruction is a 32 bit int)
 
-	HASHMAP_ELEMENT_T label_map[file_length];
+	HASHMAP_ELEMENT_T label_map[MAX_LABELS];
 
 	// LIST_T* labels_list_head = (LIST_T*)malloc(sizeof(LIST_T));
 
@@ -62,7 +61,7 @@ int main(int argc, char* argv[]){
 	
 		if (endsWith(line, ':')){
 			removeCharacter(line, ':');
-			mapPut(label_map, line, address_count, file_length);
+			mapPut(label_map, line, address_count);
 		}
 
 		address_count += 3;
@@ -96,7 +95,7 @@ int main(int argc, char* argv[]){
 
 		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));
 
-		instructions[instruction_index] = tokenize(line);
+		instructions[instruction_index] = tokenize(line, label_map);
 
 		instruction_index++;
 	}

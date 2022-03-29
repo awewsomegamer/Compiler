@@ -11,7 +11,7 @@ bool endsWith(char* line, char c);
 int strToBinary(char* line);
 uint64_t hashStr(char* str);
 void removeCharacter(char* line, char c);
-void mapPut(HASHMAP_ELEMENT_T map[], char* id, int value, long length);
-HASHMAP_ELEMENT_T mapGet(HASHMAP_ELEMENT_T map[], char* id, long length);
+void mapPut(HASHMAP_ELEMENT_T map[], char* id, int value);
+HASHMAP_ELEMENT_T mapGet(HASHMAP_ELEMENT_T map[], char* id);
 
 #endif
