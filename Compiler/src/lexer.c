@@ -52,6 +52,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 
 		int last_index = 0;
 		int i = 0;
+		
 		for (; i < space_index; i++){
 			memcpy(section_buffer, line+last_index,  space_indices[i]-last_index);
 			last_index = space_indices[i];
@@ -75,6 +76,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		// Operations and registers can only be lowercase
 
 		for (int i = 0; i < sizeof(OPERATION_T_NAMES)/sizeof(OPERATION_T_NAMES[0]); i++){
+
 			if (strcmp(sections[0], OPERATION_T_NAMES[i]) == 0){
 				result.operation = i;
 				break;
@@ -86,28 +88,34 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		int indices = 0;
 
 		for (int i = 0; i < space_index; i++){
-			int value = indexRegister(sections[i+1]);
+			uint32_t value = indexRegister(sections[i+1]);
 
 			if (value == -1){
 				if (indices == 0) indices = i;
 				else indices++;
 
 				// Check if section is reffering plain value (int, char, etc...)
-
-				if (*(sections[i+1]) == '\''){
+				
+				if (startsWith(sections[i+1], "'")){
 					// Char
-					value = *(sections[i]+1);
+					char* string = malloc(2);
+					strncpy(string, sections[i+1], 2);
+
+					value = (int)*(string+1);
+
+					free(string);
 				}else if (startsWith(sections[i+1], "0x")){
 					// Hex
 					value = strtol(sections[i+1], NULL, 16);
 				}else if (startsWith(sections[i+1], "0b")){
 					// Binary
 					value = strToBinary(sections[i+1]);
-				}else{
+				}else if (isNumber(sections[i+1])){
 					// Integer
 					value = atoi(sections[i+1]);
 				}
 			}
+			// printf("%d < VALUE <%s\n", value, sections[i+1]);
 
 			// Not plain value, check labels
 			if (value == -1){
@@ -115,6 +123,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 				else indices++;
 
 				HASHMAP_ELEMENT_T label = mapGet(label_map, sections[i+1]);
+
 				value = label.value;
 			}
 			// Otherwise get address of label if section does not start with '[' and end with ']'

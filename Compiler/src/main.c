@@ -87,6 +87,7 @@ int main(int argc, char* argv[]){
 
 	while (fgets(line, sizeof(line), in_file)){
 		removeCharacter(line, '\t');
+		removeCharacter(line, '\n');
 
 		int semcol_index = 0;
 		for (; semcol_index < LINE_SIZE; semcol_index++)

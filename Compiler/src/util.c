@@ -25,6 +25,14 @@ bool endsWith(char* line, char c){
 	return false;
 }
 
+bool isNumber(char* line){
+	for (int i = 0; i < strlen(line); i++)
+		if (!isdigit(*(line + i)))
+			return false;
+
+	return true;
+}
+
 // 0b included
 int strToBinary(char* line){
 	int result = 0;
