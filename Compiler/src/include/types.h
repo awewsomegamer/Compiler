@@ -22,7 +22,7 @@ typedef enum {
 	I4 = 0x110
 } REGISTER_T;
 
-static const char* OPERATION_T_NAMES[] = {"nop", "mov", "sub", "add", "div", "mul", "and", "or", "xor", "not", "shl", "shr", "int", "call", "jmp", "cmp", "je", "jne", "jz", "jnz", "jc", "jnc", "ret"};
+static const char* OPERATION_T_NAMES[] = {"nop", "mov", "sub", "add", "div", "mul", "and", "or", "xor", "not", "shl", "shr", "int", "call", "jmp", "cmp", "je", "jne", "jg", "jge", "jl", "jle", "ret"};
 typedef enum {
 		NOP = 0,
 		MOV = 1,

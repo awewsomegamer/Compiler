@@ -76,7 +76,6 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		// Operations and registers can only be lowercase
 
 		for (int i = 0; i < sizeof(OPERATION_T_NAMES)/sizeof(OPERATION_T_NAMES[0]); i++){
-
 			if (strcmp(sections[0], OPERATION_T_NAMES[i]) == 0){
 				result.operation = i;
 				break;
@@ -118,6 +117,8 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 			// printf("%d < VALUE <%s\n", value, sections[i+1]);
 
 			// Not plain value, check labels
+			// ISSUE: Labels that are not valid, are included in this if statement
+			// and written to the result.
 			if (value == -1){
 				if (indices == 0) indices = 4;
 				else indices++;
@@ -133,6 +134,8 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 				result.value1 = value;
 			else if (i == 1)
 				result.value2 = value;
+
+			// printf("%s\n", sections[i+1]);
 		}
 
 		result.operation |= indices << 8;

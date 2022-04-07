@@ -64,7 +64,7 @@ int main(int argc, char* argv[]){
 			mapPut(label_map, line, address_count);
 		}
 
-		address_count += 3;
+		address_count += INSTRUCTION_SIZE_BYTES;
 	}
 
 	// current = labels_list_head;
@@ -114,7 +114,7 @@ int main(int argc, char* argv[]){
 
 	instruction_index = 0;
 	for (; instruction_index < file_length; instruction_index++){
-		// printf("%d : %d : %d\n",instructions[instruction_index].operation, instructions[instruction_index].value1, instructions[instruction_index].value2);
+		// printf("%d : %d : %d\n",instructions[instruction_index].operation  >> 8 & 0xFF, instructions[instruction_index].value1, instructions[instruction_index].value2);
 
 	// 	uint16_t operation = current->value.operation;
 	// 	uint16_t v1 = current->value.value1;
