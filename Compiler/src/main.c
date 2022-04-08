@@ -58,13 +58,18 @@ int main(int argc, char* argv[]){
 				break;
 
 		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));
-	
+
 		if (endsWith(line, ':')){
 			removeCharacter(line, ':');
 			mapPut(label_map, line, address_count);
 		}
 
-		address_count += INSTRUCTION_SIZE_BYTES;
+		for (int i = 0; i < sizeof(OPERATION_T_NAMES)/sizeof(OPERATION_T_NAMES[0]); i++){
+			if (startsWith(line, OPERATION_T_NAMES[i])){
+				address_count += INSTRUCTION_SIZE_BYTES;
+				break;
+			}
+		}
 	}
 
 	// current = labels_list_head;
@@ -89,6 +94,8 @@ int main(int argc, char* argv[]){
 		removeCharacter(line, '\t');
 		removeCharacter(line, '\n');
 
+//		printf("-- %s --\n", line);
+
 		int semcol_index = 0;
 		for (; semcol_index < LINE_SIZE; semcol_index++)
 			if (*(line+semcol_index) == ';')
@@ -97,6 +104,8 @@ int main(int argc, char* argv[]){
 		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));
 
 		instructions[instruction_index] = tokenize(line, label_map);
+		
+		// printf("OPERATION: %u\nINDEX: %u\nV1: %u\nV2: %u\n\n", instructions[instruction_index].operation & 0xFF, instructions[instruction_index].operation & 0xFF00, instructions[instruction_index].value1, instructions[instruction_index].value2);
 
 		instruction_index++;
 	}
@@ -120,9 +129,11 @@ int main(int argc, char* argv[]){
 	// 	uint16_t v1 = current->value.value1;
 	// 	uint16_t v2 = current->value.value2;
 
-		putw((int)instructions[instruction_index].operation, out_file);
-		putw((int)instructions[instruction_index].value1, out_file);
-		putw((int)instructions[instruction_index].value2, out_file);
+		if (instructions[instruction_index].operation != -1){
+			putw((int)instructions[instruction_index].operation, out_file);
+			putw((int)instructions[instruction_index].value1, out_file);
+			putw((int)instructions[instruction_index].value2, out_file);
+		}
 
 	// 	current = current->next;
 	}

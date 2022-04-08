@@ -34,7 +34,7 @@ REGISTER_T indexRegister(char* name){
 }
 
 TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
-	TOKEN_T result = {NOP,NOP,NOP};
+	TOKEN_T result = {-1,0,0};
 
 	if (strlen(line) > 1){
 		int space_indices[LINE_SIZE];
@@ -84,10 +84,12 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 
 		// Index values
 		// 0 = none, 1 = first value, 2 = second value, 3 = both values, 4 = first value label, 5 = second value label, 6 = both values are labels
-		int indices = 0;
+		uint8_t indices = 0;
+		uint8_t register_count = 0;
 
 		for (int i = 0; i < space_index; i++){
 			uint32_t value = indexRegister(sections[i+1]);
+			if (value != -1) register_count++;
 
 			if (value == -1){
 				if (indices == 0) indices = i;
@@ -137,6 +139,9 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 
 			// printf("%s\n", sections[i+1]);
 		}
+		
+		if (register_count == 2) indices = 3;
+		else indices = register_count;
 
 		result.operation |= indices << 8;
 	}
