@@ -122,8 +122,13 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 			// ISSUE: Labels that are not valid, are included in this if statement
 			// and written to the result.
 			if (value == -1){
-				if (indices == 0) indices = 4;
-				else indices++;
+				char* tmp = malloc(1);
+				strncpy(tmp, sections[i+1], 1);
+
+				if (i == 1 && *tmp == '[')
+					indices = 4 + register_count;
+
+				free(tmp);
 
 				HASHMAP_ELEMENT_T label = mapGet(label_map, sections[i+1]);
 
@@ -141,8 +146,8 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		}
 		
 		if (register_count == 2) indices = 3;
-		else indices = register_count;
-
+		else if (indices == 0) indices = register_count;
+		
 		result.operation |= indices << 8;
 	}
 
