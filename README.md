@@ -12,7 +12,7 @@ OPERATION CODE (8 bits), REGISTER MASK (8 bits), VALUE 1 (32 bits), VALUE 2 (32 
 
 Diagram (Little Endian)
 
-0           8        12       16           48           112
+0           8        12       16           48           80
 +-----------+--------+--------+------------+------------+
 | OPERATION | MASK 1 | MASK 2 | ARGUMENT 1 | ARGUMENT 2 |
 +-----------+--------+--------+------------+------------+
