@@ -7,7 +7,23 @@ Image from Shutterstock
 
 ## Architecture
 Bytes are organized in this fashion
-<pre>OPERATION CODE (8 bits), REGISTER MASK (8 bits), VALUE 1 (32 bits), VALUE 2 (32 bits)</pre>
+<pre>
+OPERATION CODE (8 bits), REGISTER MASK (8 bits), VALUE 1 (32 bits), VALUE 2 (32 bits)
+
+Diagram (Little Endian)
+
+0           8        12       16           48           80
++-----------+--------+--------+------------+------------+
+| OPERATION | MASK 1 | MASK 2 | ARGUMENT 1 | ARGUMENT 2 |
++-----------+--------+--------+------------+------------+
+
+Operation: The operation to preform
+Mask 1: Describes what the first argument is (see Register mask values and descriptions)
+Mask 2: Describes what the second argument is (see Register mask values and descriptions)
+Argument 1: The first argument
+Argument 2: The second argument
+
+</pre>
 All bytes result in a value that is greater than or equal to 0, the only time a byte will be -1 is when the end of the program is reached.
 
 ### Register mask values and descriptions
