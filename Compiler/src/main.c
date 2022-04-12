@@ -106,6 +106,19 @@ int main(int argc, char* argv[]){
 		instructions[instruction_index] = tokenize(line, label_map);
 		
 		// printf("OPERATION: %u\nINDEX: %u\nV1: %u\nV2: %u\n\n", instructions[instruction_index].operation & 0xFF, instructions[instruction_index].operation & 0xFF00, instructions[instruction_index].value1, instructions[instruction_index].value2);
+		
+		if (startsWith(line, "db")){
+			// parse bytes
+			// 0x1, 0x2, 0x3
+		}
+
+		if (startsWith(line, "ds")){
+			// parse string
+			// "Hello World"
+		}
+
+		// make a 2D (256,256) table of bytes
+		// insert a token that corresponds with the index of the table
 
 		instruction_index++;
 	}
