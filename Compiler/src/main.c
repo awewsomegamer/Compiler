@@ -86,15 +86,19 @@ int main(int argc, char* argv[]){
 
 	rewind(in_file);
 
-	TOKEN_T instructions[file_length+1];
+
+	TOKEN_T instructions[file_length + 1];
+	char* definitions[file_length + 1];
 
 	int instruction_index = 0;
+	int definition_index = 0;
 
 	while (fgets(line, sizeof(line), in_file)){
-		removeCharacter(line, '\t');
+		char* original_line = malloc(sizeof(line));
+		strcpy(original_line, line);
+		
 		removeCharacter(line, '\n');
-
-//		printf("-- %s --\n", line);
+		removeCharacter(line, '\t');
 
 		int semcol_index = 0;
 		for (; semcol_index < LINE_SIZE; semcol_index++)
@@ -113,12 +117,22 @@ int main(int argc, char* argv[]){
 		}
 
 		if (startsWith(line, "ds")){
-			// parse string
-			// "Hello World"
-		}
+			int org_ln_quote = 0;
 
-		// make a 2D (256,256) table of bytes
-		// insert a token that corresponds with the index of the table
+			for (; org_ln_quote < strlen(original_line); org_ln_quote++)
+				if (*(original_line + org_ln_quote) == '\"')
+					break;
+
+			strncpy(definitions[definition_index], original_line + org_ln_quote + 1, strlen(original_line));
+			memset(definitions[definition_index] + strlen(definitions[definition_index]) - 2, 0, 1);
+
+			TOKEN_T def_token;
+			def_token.operation = DEFINITION;
+			def_token.value1 = definition_index;
+			instructions[instruction_index] = def_token;
+
+			definition_index++;
+		}
 
 		instruction_index++;
 	}
@@ -134,6 +148,7 @@ int main(int argc, char* argv[]){
 		free(name);
 	}
 
+
 	instruction_index = 0;
 	for (; instruction_index < file_length; instruction_index++){
 		// printf("%d : %d : %d\n",instructions[instruction_index].operation  >> 8 & 0xFF, instructions[instruction_index].value1, instructions[instruction_index].value2);
@@ -142,10 +157,13 @@ int main(int argc, char* argv[]){
 	// 	uint16_t v1 = current->value.value1;
 	// 	uint16_t v2 = current->value.value2;
 
-		if (instructions[instruction_index].operation != -1){
+		if (instructions[instruction_index].operation > -1){
 			putw((int)instructions[instruction_index].operation, out_file);
 			putw((int)instructions[instruction_index].value1, out_file);
 			putw((int)instructions[instruction_index].value2, out_file);
+		}else if (instructions[instruction_index].operation == DEFINITION){
+			for (int i = 0; i < strlen(definitions[instructions[instruction_index].value1]) + 1; i++)
+				fwrite(((definitions[instructions[instruction_index].value1] + i)), 1, sizeof(char), out_file);
 		}
 
 	// 	current = current->next;

@@ -47,7 +47,8 @@ typedef enum {
 		JC = 20,
 		JNC = 21,
 		RET = 22,
-		ENDFILE = -1
+		ENDFILE = -1,
+		DEFINITION = -2
 } OPERATION_T;
 
 typedef struct {
@@ -65,6 +66,5 @@ typedef struct {
 	char* id;
 	int value;
 } HASHMAP_ELEMENT_T;
-
 
 #endif
