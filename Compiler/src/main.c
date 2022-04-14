@@ -86,17 +86,16 @@ int main(int argc, char* argv[]){
 
 	rewind(in_file);
 
-
 	TOKEN_T instructions[file_length + 1];
-	char* definitions[file_length + 1];
-
+	char* definitions[file_length + 1][LINE_SIZE];
+	
 	int instruction_index = 0;
 	int definition_index = 0;
 
 	while (fgets(line, sizeof(line), in_file)){
 		char* original_line = malloc(sizeof(line));
 		strcpy(original_line, line);
-		
+
 		removeCharacter(line, '\n');
 		removeCharacter(line, '\t');
 
@@ -123,8 +122,7 @@ int main(int argc, char* argv[]){
 				if (*(original_line + org_ln_quote) == '\"')
 					break;
 
-			strncpy(definitions[definition_index], original_line + org_ln_quote + 1, strlen(original_line));
-			memset(definitions[definition_index] + strlen(definitions[definition_index]) - 2, 0, 1);
+			strncpy(definitions[definition_index], original_line + org_ln_quote + 1, strlen(original_line) - (org_ln_quote * 1.75));
 
 			TOKEN_T def_token;
 			def_token.operation = DEFINITION;

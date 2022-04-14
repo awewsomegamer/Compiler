@@ -83,70 +83,102 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		}
 
 		// Index values
-		// 0 = none, 1 = first value, 2 = second value, 3 = both values, 4 = first value label, 5 = second value label, 6 = both values are labels
+		// 0 regular value (0xEEE and or label addresses)
+		// 1 register value (AX = 0x10)
+		// 2 register's value pointer ([AX] = [0x10])
+		// 3 value of memory address ([0x10] or [LABEL])
+
 		uint8_t indices = 0;
 		uint8_t register_count = 0;
 
+		char* section = malloc(sizeof(sections[i+1]));
+		char* section_clean = malloc(sizeof(sections[i+1]));
 		for (int i = 0; i < space_index; i++){
-			uint32_t value = indexRegister(sections[i+1]);
-			if (value != -1) register_count++;
+			memset(section, 0, sizeof(section));
+			memset(section_clean, 0, sizeof(section));
+
+			strcpy(section, sections[i+1]);
+			strcpy(section_clean, sections[i+1]);
+			removeCharacter(section_clean, '[');
+			removeCharacter(section_clean, ']');
+			
+			uint8_t singular_index = 0;
+			uint32_t value = indexRegister(section_clean);
+
+			if (value != -1)
+				singular_index = 1 + (*section == '[' ? 1 : 0);
 
 			if (value == -1){
-				if (indices == 0) indices = i;
-				else indices++;
-
 				// Check if section is reffering plain value (int, char, etc...)
-				
-				if (startsWith(sections[i+1], "'")){
+
+				if (startsWith(section, "'")){
 					// Char
 					char* string = malloc(2);
-					strncpy(string, sections[i+1], 2);
+					strncpy(string, section_clean, 2);
 
 					value = (int)*(string+1);
 
 					free(string);
-				}else if (startsWith(sections[i+1], "0x")){
+				}else if (startsWith(section_clean, "0x")){
 					// Hex
-					value = strtol(sections[i+1], NULL, 16);
-				}else if (startsWith(sections[i+1], "0b")){
+					value = strtol(section_clean, NULL, 16);
+				}else if (startsWith(section_clean, "0b")){
 					// Binary
-					value = strToBinary(sections[i+1]);
-				}else if (isNumber(sections[i+1])){
+					value = strToBinary(section_clean);
+				}else if (isNumber(section_clean)){
 					// Integer
-					value = atoi(sections[i+1]);
+					value = atoi(section_clean);
 				}
-			}
-			// printf("%d < VALUE <%s\n", value, sections[i+1]);
 
-			// Not plain value, check labels
-			// ISSUE: Labels that are not valid, are included in this if statement
-			// and written to the result.
+				if (value != -1)
+					singular_index = (*section == '[' ? 4 : 0);
+			}
+
+			// // printf("%d < VALUE <%s\n", value, sections[i+1]);
+
+			// // Not plain value, check labels
+			// // ISSUE: Labels that are not valid, are included in this if statement
+			// // and written to the result.
 			if (value == -1){
 				char* tmp = malloc(1);
 				strncpy(tmp, sections[i+1], 1);
 
-				if (i == 1 && *tmp == '[')
-					indices = 4 + register_count;
+				if (*tmp == '[')
+					indices = 4;
 
 				free(tmp);
 
-				HASHMAP_ELEMENT_T label = mapGet(label_map, sections[i+1]);
+				HASHMAP_ELEMENT_T label = mapGet(label_map, section_clean);
 
 				value = label.value;
-			}
-			// Otherwise get address of label if section does not start with '[' and end with ']'
-			// When label starts with '[' and ends with ']' return value of label
 
-			if (i == 0)
-				result.value1 = value;
-			else if (i == 1)
-				result.value2 = value;
+				if (value != -1)
+					singular_index = (*section == '[' ? 4 : 0);
+			}
+
+			// // Otherwise get address of label if section does not start with '[' and end with ']'
+			// // When label starts with '[' and ends with ']' return value of label
+
+			// if (i == 0)
+			// 	result.value1 = value;
+			// else if (i == 1)
+			// 	result.value2 = value;
 
 			// printf("%s\n", sections[i+1]);
+
+			printf("i: %d\n", i);
+			printf("value: %d\n", value);
+			printf("index: %d\n", singular_index);
+			printf("%s\n\n", line);
+
+			indices |= singular_index << i * 4;
 		}
+
+		free(section);
+		free(section_clean);
 		
-		if (register_count == 2) indices = 3;
-		else if (indices == 0) indices = register_count;
+		// if (register_count == 2) indices = 3;
+		// else if (indices == 0) indices = register_count;
 		
 		result.operation |= indices << 8;
 	}
