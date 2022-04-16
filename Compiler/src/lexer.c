@@ -159,17 +159,12 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 			// // Otherwise get address of label if section does not start with '[' and end with ']'
 			// // When label starts with '[' and ends with ']' return value of label
 
-			// if (i == 0)
-			// 	result.value1 = value;
-			// else if (i == 1)
-			// 	result.value2 = value;
+			if (i == 0)
+				result.value1 = value;
+			else if (i == 1)
+				result.value2 = value;
 
 			// printf("%s\n", sections[i+1]);
-
-			printf("i: %d\n", i);
-			printf("value: %d\n", value);
-			printf("index: %d\n", singular_index);
-			printf("%s\n\n", line);
 
 			indices |= singular_index << i * 4;
 		}
