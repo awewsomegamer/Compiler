@@ -159,8 +159,9 @@ int main(int argc, char* argv[]){
 			putw((int)instructions[instruction_index].value1, out_file);
 			putw((int)instructions[instruction_index].value2, out_file);
 		}else if (instructions[instruction_index].operation == DEFINITION){
-			for (int i = 0; i < strlen(definitions[instructions[instruction_index].value1]) + 1; i++)
-				fwrite(((definitions[instructions[instruction_index].value1] + i)), 1, sizeof(char), out_file);
+			printf("%s\n", definitions[instructions[instruction_index].value1]);
+			fputs(definitions[instructions[instruction_index].value1], out_file);
+			fputc(0, out_file);
 		}
 
 	// 	current = current->next;
