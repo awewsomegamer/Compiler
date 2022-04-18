@@ -100,7 +100,8 @@ int main(int argc, char* argv[]){
 		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));
 
 		instructions[instruction_index] = tokenize(line, label_map);
-
+		
+		// Check if bytes are being defined
 		if (startsWith(line, "db ")){
 			// db 0x0, 0xA, 0xD
 			
@@ -141,6 +142,7 @@ int main(int argc, char* argv[]){
 			free(current_byte_string);
 		}
 
+		// Check if a string is being defined
 		if (startsWith(line, "ds ")){
 			int org_ln_quote = 0;
 
@@ -157,6 +159,22 @@ int main(int argc, char* argv[]){
 
 			definition_index++;
 		}
+
+		/*
+		Sections:
+
+
+		.section DATA
+		; data stuff here
+		.end
+
+		---------
+		Everything that is not included within the .section start and the .end end is code
+		---------
+		0x48 <- example code for starting a data section
+		0x.. <- data
+		0x40 <- general end section code
+		*/
 
 		instruction_index++;
 	}
