@@ -91,7 +91,6 @@ int main(int argc, char* argv[]){
 
 		removeCharacter(line, '\n');
 		removeCharacter(line, '\t');
-			printf("%s\n", line);
 
 		int semcol_index = 0;
 		for (; semcol_index < LINE_SIZE; semcol_index++)
@@ -107,11 +106,13 @@ int main(int argc, char* argv[]){
 			
 			char* current_byte_string = malloc(4);
 			int current_byte_string_idx = 0;
-			int bytes_size = 0;
+			int bytes_size = 1;
 			
 			for (int i = 0; i < strlen(line); i++) 
 				if (*(line + i) == ',') 
 					bytes_size++;
+
+			printf("%d", bytes_size);
 
 			uint8_t bytes[bytes_size];
 			int byte_ptr = 0;
@@ -120,8 +121,9 @@ int main(int argc, char* argv[]){
 				if (*(line + i) != ',')
 					*(current_byte_string + current_byte_string_idx++) = *(line + i);
 				
-				if (*(line + i) == ','){
+				if (*(line + i) == ',' || i >= strlen(line) - 1){
 					bytes[byte_ptr] = strtol(current_byte_string, NULL, 16);
+					printf("%s\n", current_byte_string);
 					byte_ptr++;
 					current_byte_string_idx = 0;
 				}
@@ -135,7 +137,6 @@ int main(int argc, char* argv[]){
 			instructions[instruction_index] = def_token;
 
 			definition_index++;
-			printf("%d\n", strlen(bytes));
 
 			free(current_byte_string);
 		}
