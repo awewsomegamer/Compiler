@@ -15,6 +15,7 @@ int main(int argc, char* argv[]){
 	FILE* out_file;
 	bool out_file_set = false;
 
+	// Interpret arguments
 	for (int i = 1; i < argc; i++){
 		if (startsWith(argv[i], "-o")){
 			out_file = fopen(argv[i+1], "w");
@@ -44,14 +45,15 @@ int main(int argc, char* argv[]){
 
 	HASHMAP_ELEMENT_T label_map[MAX_LABELS];
 
-	// LIST_T* labels_list_head = (LIST_T*)malloc(sizeof(LIST_T));
-
+	// Look for lines ending in ':' - labels.
 	while (fgets(line, sizeof(line), in_file)){
+		// Clean line
 		removeCharacter(line, '\t');
 		removeCharacter(line, '\n');
 		removeCharacter(line, '\r');
 		removeCharacter(line, ' ');
 
+		// Remove comments
 		int semcol_index = 0;
 		for (; semcol_index < LINE_SIZE; semcol_index++)
 			if (*(line+semcol_index) == ';')
@@ -59,11 +61,13 @@ int main(int argc, char* argv[]){
 
 		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));
 
+		// Add to label map if line is a label
 		if (endsWith(line, ':')){
 			removeCharacter(line, ':');
 			mapPut(label_map, line, address_count);
 		}
 
+		// Only increment address if the line is a valid operation
 		for (int i = 0; i < sizeof(OPERATION_T_NAMES)/sizeof(OPERATION_T_NAMES[0]); i++){
 			if (startsWith(line, OPERATION_T_NAMES[i])){
 				address_count += INSTRUCTION_SIZE_BYTES;
@@ -71,18 +75,6 @@ int main(int argc, char* argv[]){
 			}
 		}
 	}
-
-	// current = labels_list_head;
-
-	// while (current->next != NULL){
-		// printf("%d : %s\n",current->lvalue.address, current->lvalue.name);
-
-		// current = current->next;
-	// }
-
-	// Read file, detect labels, note down their address, name, and value into an array
-	// Lexer uses data of labels to fill in the references of labels in code
-
 
 	rewind(in_file);
 
@@ -92,12 +84,14 @@ int main(int argc, char* argv[]){
 	int instruction_index = 0;
 	int definition_index = 0;
 
+	// Parse instructions and or definitions and put them into their respective arrays
 	while (fgets(line, sizeof(line), in_file)){
 		char* original_line = malloc(sizeof(line));
 		strcpy(original_line, line);
 
 		removeCharacter(line, '\n');
 		removeCharacter(line, '\t');
+			printf("%s\n", line);
 
 		int semcol_index = 0;
 		for (; semcol_index < LINE_SIZE; semcol_index++)
@@ -108,14 +102,45 @@ int main(int argc, char* argv[]){
 
 		instructions[instruction_index] = tokenize(line, label_map);
 		
-		// printf("OPERATION: %u\nINDEX: %u\nV1: %u\nV2: %u\n\n", instructions[instruction_index].operation & 0xFF, instructions[instruction_index].operation & 0xFF00, instructions[instruction_index].value1, instructions[instruction_index].value2);
-		
-		if (startsWith(line, "db")){
-			// parse bytes
-			// 0x1, 0x2, 0x3
+		if (startsWith(line, "db ")){
+			// db 0x0, 0xA, 0xD
+			
+			char* current_byte_string = malloc(4);
+			int current_byte_string_idx = 0;
+			int bytes_size = 0;
+			
+			for (int i = 0; i < strlen(line); i++) 
+				if (*(line + i) == ',') 
+					bytes_size++;
+
+			uint8_t bytes[bytes_size];
+			int byte_ptr = 0;
+
+			for (int i = 2; i < strlen(line); i++){
+				if (*(line + i) != ',')
+					*(current_byte_string + current_byte_string_idx++) = *(line + i);
+				
+				if (*(line + i) == ','){
+					bytes[byte_ptr] = strtol(current_byte_string, NULL, 16);
+					byte_ptr++;
+					current_byte_string_idx = 0;
+				}
+			}
+			
+			strncpy(definitions[definition_index], bytes, bytes_size);
+
+			TOKEN_T def_token;
+			def_token.operation = DEFINITION_BYTES;
+			def_token.value1 = definition_index;
+			instructions[instruction_index] = def_token;
+
+			definition_index++;
+			printf("%s\n", bytes);
+
+			free(current_byte_string);
 		}
 
-		if (startsWith(line, "ds")){
+		if (startsWith(line, "ds ")){
 			int org_ln_quote = 0;
 
 			for (; org_ln_quote < strlen(original_line); org_ln_quote++)
@@ -125,7 +150,7 @@ int main(int argc, char* argv[]){
 			strncpy(definitions[definition_index], original_line + org_ln_quote + 1, strlen(original_line) - (org_ln_quote * 1.75));
 
 			TOKEN_T def_token;
-			def_token.operation = DEFINITION;
+			def_token.operation = DEFINITION_STRING;
 			def_token.value1 = definition_index;
 			instructions[instruction_index] = def_token;
 
@@ -135,9 +160,7 @@ int main(int argc, char* argv[]){
 		instruction_index++;
 	}
 
-	// compiler
-	// output
-
+	// If not out file is set, then an outfile will be generated with the in file's name + ".out"
 	if (!out_file_set){
 		char* name = malloc(strlen(in_file_name)+4);
 		sprintf(name, "%s.out", in_file_name);
@@ -146,25 +169,24 @@ int main(int argc, char* argv[]){
 		free(name);
 	}
 
+	// Write bytes
 	instruction_index = 0;
 	for (; instruction_index < file_length; instruction_index++){
-		// printf("%d : %d : %d\n",instructions[instruction_index].operation  >> 8 & 0xFF, instructions[instruction_index].value1, instructions[instruction_index].value2);
-
-	// 	uint16_t operation = current->value.operation;
-	// 	uint16_t v1 = current->value.value1;
-	// 	uint16_t v2 = current->value.value2;
-
-		if (instructions[instruction_index].operation > -1){
+		if (instructions[instruction_index].operation > ENDFILE){
 			putw((int)instructions[instruction_index].operation, out_file);
 			putw((int)instructions[instruction_index].value1, out_file);
 			putw((int)instructions[instruction_index].value2, out_file);
-		}else if (instructions[instruction_index].operation == DEFINITION){
-			printf("%s\n", definitions[instructions[instruction_index].value1]);
+		}
+		
+		if (instructions[instruction_index].operation == DEFINITION_STRING){
 			fputs(definitions[instructions[instruction_index].value1], out_file);
 			fputc(0, out_file);
 		}
-
-	// 	current = current->next;
+		
+		if (instructions[instruction_index].operation == DEFINITION_BYTES){
+			// printf("%c\n", definitions[instructions[instruction_index].value1][0]);
+			fputs(definitions[instructions[instruction_index].value1], out_file);
+		}
 	}
 
 	return 0;

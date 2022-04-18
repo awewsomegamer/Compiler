@@ -48,7 +48,8 @@ typedef enum {
 		JNC = 21,
 		RET = 22,
 		ENDFILE = -1,
-		DEFINITION = -2
+		DEFINITION_STRING = -2,
+		DEFINITION_BYTES = -3
 } OPERATION_T;
 
 typedef struct {
