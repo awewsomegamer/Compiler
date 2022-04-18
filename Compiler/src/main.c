@@ -101,27 +101,6 @@ int main(int argc, char* argv[]){
 		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));
 
 		instructions[instruction_index] = tokenize(line, label_map);
-		
-		/* test.a
-
-			mov bx, FunkyString
-			call printstr
-
-			printstr:
-				.Loop:
-					mov cx, [bx]
-					cmp cl, 0
-					je .End
-					int 0x10
-					jmp .Loop	
-				.End:
-
-			FunkyString:
-				ds "Hello World"
-				db 0x48
-
-
-		*/
 
 		if (startsWith(line, "db ")){
 			// db 0x0, 0xA, 0xD
@@ -156,7 +135,7 @@ int main(int argc, char* argv[]){
 			instructions[instruction_index] = def_token;
 
 			definition_index++;
-			printf("%s\n", bytes);
+			printf("%d\n", strlen(bytes));
 
 			free(current_byte_string);
 		}
