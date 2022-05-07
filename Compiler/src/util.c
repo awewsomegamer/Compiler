@@ -2,6 +2,8 @@
 #include <global.h>
 #include <ctype.h>
 #include <types.h>
+#include <stdio.h>
+#include <string.h>
 
 bool startsWith(const char* str, const char* lookfor){
 	if (strncmp(str, lookfor, strlen(lookfor)) == 0)
@@ -63,7 +65,7 @@ uint64_t hashStr(char* str){
 
 void removeCharacter(char* line, char c){
 	if (containsCharacter(line, c)){
-		char* tmp = malloc(strlen(line));
+		char* tmp = strdup(line);
 		strcpy(tmp, line);
 		memset(line, 0, strlen(tmp));
 
@@ -74,9 +76,6 @@ void removeCharacter(char* line, char c){
 				line_clean_i++;
 			}
 		}
-
-		memset(tmp, 0, strlen(tmp));
-		free(tmp);
 	}
 }
 

@@ -15,6 +15,7 @@ int main(int argc, char* argv[]){
 	FILE* out_file;
 	bool out_file_set = false;
 
+
 	// Interpret arguments
 	for (int i = 1; i < argc; i++){
 		if (startsWith(argv[i], "-o")){
@@ -174,6 +175,12 @@ int main(int argc, char* argv[]){
 		0x48 <- example code for starting a data section
 		0x.. <- data
 		0x40 <- general end section code
+
+
+		SECTION_START:
+		jmp SECTION_END
+
+		SECTION_END:
 		*/
 
 		instruction_index++;

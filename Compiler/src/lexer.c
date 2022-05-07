@@ -3,7 +3,7 @@
 #include <util.h>
 
 // Check if given name is a register, return it's value if so, otherwise return -1
-REGISTER_T indexRegister(char* name){
+int indexRegister(char* name){
 	for (int i = 0; i < sizeof(REGISTER_T_NAMES)/sizeof(REGISTER_T_NAMES[0]); i++){
 		if (strcmp(name, REGISTER_T_NAMES[i]) == 0){
 			// Ending
@@ -140,7 +140,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 
 				// If plain value is found, set the index accordingly (pointer or plain value)
 				if (value != -1)
-					singular_index = (*section == '[' ? 4 : 0);
+					singular_index = (*section == '[' ? 3 : 0);
 			}
 
 			// If value is still not found, check label map
@@ -151,7 +151,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 				
 				// If label is found, set the index accordingly (pointer or plain value)
 				if (value != -1)
-					singular_index = (*section == '[' ? 4 : 0);
+					singular_index = (*section == '[' ? 3 : 0);
 			}
 
 			// Set the values of the result token
