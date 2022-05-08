@@ -43,8 +43,12 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 
 		int space_index = 0;
 
+		bool instruction_started = false;
+
 		for (int i = 0; i < strlen(line); i++){
-			if (*(line + i) == ' '){
+			if (*(line + i) != ' ') instruction_started = true;
+
+			if (*(line + i) == ' ' && instruction_started){
 				space_indices[space_index] = i;
 				space_index++;
 			}
