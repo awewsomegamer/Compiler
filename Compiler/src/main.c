@@ -64,6 +64,8 @@ int main(int argc, char* argv[]){
 
 		// Add to label map if line is a label
 		if (endsWith(line, ':')){
+			printf("%s %X\n", line, address_count);
+
 			removeCharacter(line, ':');
 			mapPut(label_map, line, address_count);
 		}
@@ -197,7 +199,8 @@ int main(int argc, char* argv[]){
 
 	// Write bytes
 	instruction_index = 0;
-	for (; instruction_index < file_length; instruction_index++){
+	for (; instruction_index < file_length + 1; instruction_index++){
+			// printf("%d\n", instructions[instruction_index].operation & 0xFF);
 		if (instructions[instruction_index].operation > ENDFILE){
 			putw((int)instructions[instruction_index].operation, out_file);
 			putw((int)instructions[instruction_index].value1, out_file);

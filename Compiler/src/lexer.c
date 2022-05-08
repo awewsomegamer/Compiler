@@ -3,7 +3,7 @@
 #include <util.h>
 
 // Check if given name is a register, return it's value if so, otherwise return -1
-int indexRegister(char* name){
+REGISTER_T indexRegister(char* name){
 	for (int i = 0; i < sizeof(REGISTER_T_NAMES)/sizeof(REGISTER_T_NAMES[0]); i++){
 		if (strcmp(name, REGISTER_T_NAMES[i]) == 0){
 			// Ending
@@ -36,12 +36,13 @@ int indexRegister(char* name){
 
 TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 	TOKEN_T result = {-1,0,0};
-
-	if (strlen(line) > 1){
+	
+	if (strlen(line) >= 1){
 		// Split line using the space character
 		int space_indices[LINE_SIZE];
 
 		int space_index = 0;
+
 		for (int i = 0; i < strlen(line); i++){
 			if (*(line + i) == ' '){
 				space_indices[space_index] = i;
@@ -170,6 +171,8 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		
 		// Write the final indices into the higher byte of the result's operation
 		result.operation |= indices << 8;
+
+		printf("%X %X %X %s\n", result.operation, result.value1, result.value2, line);
 	}
 
 	return result;
