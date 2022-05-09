@@ -11,11 +11,9 @@ REGISTER_T indexRegister(char* name){
 			// L = /2
 			// H = -1
 
-			int index = i/3+1;
-
 			// ABCD registers
-			if (index < 5){
-				index *= 0x10;
+			if (i < 12){
+				int index = (i / 3) * 0x10;
 
 				switch((int)*(name+1)){
 				case 'x': return index;
@@ -24,8 +22,8 @@ REGISTER_T indexRegister(char* name){
 				}
 			}
 
-			if (index >= 5)
-				return index*0x10;
+			if (i >= 12)
+				return (i - 7) * 0x10;
 
 			break;
 		}
@@ -88,6 +86,28 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 				result.operation = i;
 				break;
 			}
+		}
+
+		if (result.operation == INCLUDE){
+			// Include type
+			result.value1 = endsWith(sections[0], "#") ? 1 : 0; // Include type binary
+			result.value1 = endsWith(sections[0], "%") ? 2 : 0; // Include type code
+
+			char* path = malloc(strlen(line));
+			int path_i = 0;
+			bool copy = false;
+
+			// Parse path from quotation marks
+			for (int i = 0; i < strlen(line); i++){
+				if (*(line + i) == '"') copy = !copy;
+				if (copy) *(path + (path_i++)) = *(line + i);
+			}
+
+			result.extra_bytes = strdup(path);
+
+			free(path);
+
+			return result;
 		}
 
 		// Index values

@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 
 #include <global.h>
@@ -48,6 +49,8 @@ int main(int argc, char* argv[]){
 
 	// Look for lines ending in ':' - labels.
 	while (fgets(line, sizeof(line), in_file)){
+		char* original_line = strdup(line);
+
 		// Clean line
 		removeCharacter(line, '\t');
 		removeCharacter(line, '\n');
@@ -62,7 +65,6 @@ int main(int argc, char* argv[]){
 
 		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));
 
-		// Add to label map if line is a label
 		if (endsWith(line, ':')){
 			printf("%s %X\n", line, address_count);
 
@@ -89,8 +91,7 @@ int main(int argc, char* argv[]){
 
 	// Parse instructions and or definitions and put them into their respective arrays
 	while (fgets(line, sizeof(line), in_file)){
-		char* original_line = malloc(sizeof(line));
-		strcpy(original_line, line);
+		char* original_line = strdup(line);
 
 		removeCharacter(line, '\n');
 		removeCharacter(line, '\t');
@@ -163,28 +164,6 @@ int main(int argc, char* argv[]){
 			definition_index++;
 		}
 
-		/*
-		Sections:
-
-
-		.section DATA
-		; data stuff here
-		.end
-
-		---------
-		Everything that is not included within the .section start and the .end end is code
-		---------
-		0x48 <- example code for starting a data section
-		0x.. <- data
-		0x40 <- general end section code
-
-
-		SECTION_START:
-		jmp SECTION_END
-
-		SECTION_END:
-		*/
-
 		instruction_index++;
 	}
 
@@ -199,7 +178,7 @@ int main(int argc, char* argv[]){
 
 	// Write bytes
 	instruction_index = 0;
-	for (; instruction_index < file_length + 1; instruction_index++){
+	for (; instruction_index < file_length; instruction_index++){
 			// printf("%d\n", instructions[instruction_index].operation & 0xFF);
 		if (instructions[instruction_index].operation > ENDFILE){
 			putw((int)instructions[instruction_index].operation, out_file);
