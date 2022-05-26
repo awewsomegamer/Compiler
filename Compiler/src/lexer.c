@@ -82,6 +82,9 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 
 		// Check operation (sections[0])
 		for (int i = 0; i < sizeof(OPERATION_T_NAMES)/sizeof(OPERATION_T_NAMES[0]); i++){
+			// printf("-- %s --\n", line);
+			// printf("%s -> %s [%d, %d]\n\n", sections[0], OPERATION_T_NAMES[i], i, strcmp(sections[0], OPERATION_T_NAMES[i]));
+
 			if (strcmp(sections[0], OPERATION_T_NAMES[i]) == 0){
 				result.operation = i;
 				break;
@@ -196,7 +199,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		// Write the final indices into the higher byte of the result's operation
 		result.operation |= indices << 8;
 
-		printf("%X %X %X %s\n", result.operation, result.value1, result.value2, line);
+		printf("OPERATION: %04X VALUE1: %08X VALUE2: %08X [LINE: %s]\n", result.operation, result.value1, result.value2, line);
 	}
 
 	return result;

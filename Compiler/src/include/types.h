@@ -23,10 +23,13 @@ typedef enum {
 } REGISTER_T;
 
 static const char* OPERATION_T_NAMES[] = {"nop", "mov", "sub", "add", 
-										"div", "mul", "and", "or", "xor", 
-										"not", "shl", "shr", "sivte", "rivte" "int", "call",
-										"jmp", "cmp", "je", "jne", "jg", "jge",
-										"jl", "jle", "jz", "jnz", "jc", "jnc", "ret", "inc", "push", "pop"};
+										  "div", "mul", "and", "or", 
+										  "xor", "not", "shl", "shr",
+										  "sivte", "rivte", "int", "call", 
+										  "jmp", "cmp", "je", "jne", "jg", 
+										  "jge", "jl", "jle", "jz", "jnz", 
+										  "jc", "jnc", "ret", "inc", "push", 
+										  "pop"};
 typedef enum {
 		NOP = 0,
 		MOV,
