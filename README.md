@@ -43,21 +43,14 @@ All bytes result in a value that is greater than or equal to 0, the only time a 
 
 <pre>
 |Registers:
-|        +- AH (higher 8 bits)
-+----AX--+
-|        +- AL (lower 8 bits)
+|        
++----AX -> 32 bit register
 |
-|        +- BH (higher 8 bits)
-+----BX--+
-|        +- BL (lower 8 bits)
++----BX -> 32 bit register
+|      
++----CX -> 32 bit register
 |
-|        +- CH (higher 8 bits)
-+----CX--+
-|        +- CL (lower 8 bits)
-|
-|        +- DH (higher 8 bits)
-+----DX--+
-|        +- DL (lower 8 bits)
++----DX -> 32 bit register
 |
 +----IP -> Instruction pointer
 |
@@ -65,65 +58,55 @@ All bytes result in a value that is greater than or equal to 0, the only time a 
 |
 +----BP -> Base pointer of the stack
 |
-+----I1 -> 16 bit integer
++----I1 -> 32 bit integer
 |
-+----I2 -> 16 bit integer
++----I2 -> 32 bit integer
 |
-+----I3 -> 16 bit integer
++----I3 -> 32 bit integer
 |
-+----I4 -> 16 bit integer
++----I4 -> 32 bit integer
 |
 -
 </pre>
 
 ## Instructions
 <pre>
-Definitions of symbols:
-  x -> register / value
-  y -> register / value
-  to -> to register / label
-  from -> from register / label
-  
-mov to, from
 
-sub x, y (ax = x - y)
+nop - preforms no operation
 
-add x, y (ax = x + y)
+mov v1, v2 - move v2 into v1
+sub v1, v2 - subtract v2 from v1
+add v1, v2 - add v2 to v1
+div v1, v2 - divide v1 by v2
+mul v1, v2 - multiply v1 by v2
 
-div x, y (ax = x / y)
+or v1, v2 - bitwise or
+xor v1, v2 - bitwise xor
+not v1 - bitwise not
+shl v1, v2 - shift v1 left by v2
+shr v1, v2 - shift v1 right by v2
 
-mul x, y (ax = x * y)
+sivte v1, v2 - set interrupt v1 to function v2
+rivte v1 - reset interrupt v1 to its original function
+int v1 - call interrupt v1
 
-and x, y (x = x & y)
+call v1 - call label v1
+jmp v1 - jump to label v1
 
-or x, y (x = x | y)
+cmp v1, v2 - compare v1 to v2, set proper flags
+je v1 - jump to label v1 if previous cmp instruction resulted in both values equalling
+jne v1 -jump to label v1 if previous cmp instruction did not result in both values equalling 
+jg v1 - jump to label v1 if previous cmp instruction resulted in the first value being larger than the second
+jge v1 - jump to label v1 if previous cmp instruction resulted in the first value being larger than the or equal to the second
+jl v1 - jump to label v1 if previous cmp instruction resulted in the first value being less than the second
+jle v1 - jump to label v1 if previous cmp instruction resulted in the first value being less than or equal to the second
+jz v1 - jump to label v1 if the zero flag is set
+jnz v1 - jump to label v1 if the zero flag is not set
+jc v1 - jump to label v1 if the carry flag is set
+jnc v1 - jump to label v1 if the carry flag is not set
 
-xor x, y (x = x ^ y)
+ret - return to the last value on the stack (use in calls only)
 
-not x (x = ~x)
-
-shl value, by (value << by) -> Shift left
-
-shr value, by (value >> by) -> Shift right
-
-int x -> Triggers interrupt of value x
-
-call label / address -> Executes code at that label / address
-
-jmp label / address -> jumps to the give label / address and proceeds execution from there
-
-cmp x, y -> compares x to y
-
-je label / address -> Jumps to label / address if equal flag is set
-
-jne label / address -> Jumps to label / address if equal flag is not set
-
-jz label / address -> Jumps to label / address if zero flag is set
-
-jnz label / address -> Jumps to label / address if zero flag is not set
-
-jc label / address -> Jumps to label / address if carry flag is set
-
-jnc label / address -> Jumps to label / address if carry flag is not set
-
+push v1 - push v1 to the stack
+pop v1 - pop the top of the stack into v1
 </pre>
