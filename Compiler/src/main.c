@@ -74,7 +74,7 @@ int main(int argc, char* argv[]){
 
 		// Only increment address if the line is a valid operation
 		for (int i = 0; i < sizeof(OPERATION_T_NAMES)/sizeof(OPERATION_T_NAMES[0]); i++){
-			if (startsWith(line, OPERATION_T_NAMES[i])){
+			if (startsWith(line, OPERATION_T_NAMES[i]) || startsWith(line, "db") || startsWith(line, "ds")){
 				address_count += INSTRUCTION_SIZE_BYTES;
 				break;
 			}
@@ -188,7 +188,7 @@ int main(int argc, char* argv[]){
 		
 		if (instructions[instruction_index].operation == DEFINITION_STRING){
 			fputs(definitions[instructions[instruction_index].value1], out_file);
-			fputc(0, out_file);
+			// fputc(0, out_file);
 		}
 		
 		if (instructions[instruction_index].operation == DEFINITION_BYTES){
