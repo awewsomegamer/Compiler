@@ -29,7 +29,8 @@ static const char* OPERATION_T_NAMES[] = {"nop", "mov", "sub", "add",
 										  "jmp", "cmp", "je", "jne", "jg", 
 										  "jge", "jl", "jle", "jz", "jnz", 
 										  "jc", "jnc", "ret", "inc", "push", 
-										  "pop"};
+										  "pop", "inb", "inw", "ind", "outb", 
+										  "outw", "outd"};
 typedef enum {
 		NOP = 0,
 		MOV,
@@ -63,6 +64,12 @@ typedef enum {
 		INCLUDE,
 		PUSH,
 		POP,
+		INB,
+		INW,
+		IND,
+		OUTB,
+		OUTW,
+		OUTD,
 		ENDFILE = -1,
 		DEFINITION_STRING = -2,
 		DEFINITION_BYTES = -3
