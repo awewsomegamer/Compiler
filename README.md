@@ -1,10 +1,5 @@
 # Szikra Assembler
 
-This is a small assembler. The name of the assembler is to be decided.
-
-<img src="https://image.shutterstock.com/image-photo/businessman-relaxing-office-chair-standing-260nw-7869196.jpg">
-Image from Shutterstock
-
 ## Architecture
 Bytes are organized in this fashion
 <pre>
