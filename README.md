@@ -1,4 +1,4 @@
-# Assembler
+# Szikra Assembler
 
 This is a small assembler. The name of the assembler is to be decided.
 
