@@ -104,4 +104,13 @@ ret - return to the last value on the stack (use in calls only)
 
 push v1 - push v1 to the stack
 pop v1 - pop the top of the stack into v1
+
+inb v1, v2 - read in a byte from address v2 into v1 from the IO port
+inw v1, v2 - read in a word from address v2 into v1 from the IO port
+ind v1, v2 - read in a double word from address v2 into v1 from the IO port
+
+outb v1, v2 - put out a byte, v2, to address v1
+outw v1, v2 - put out a word, v2, to address v1
+outd v1, v2 - put out a double word, v2, to address v1
+
 </pre>
