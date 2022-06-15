@@ -80,6 +80,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		strcpy(sections+i, section_buffer);
 		memset(section_buffer, 0, LINE_SIZE);
 
+
 		// Check operation (sections[0])
 		for (int i = 0; i < sizeof(OPERATION_T_NAMES)/sizeof(OPERATION_T_NAMES[0]); i++){
 			// printf("-- %s --\n", line);
@@ -113,13 +114,22 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 			return result;
 		}
 
-		// Index values
+		uint8_t value_count = 0;
+
+		// Index values (1 byte)
 		// 0 regular value (0xEEE and or label addresses)
 		// 1 register value (AX = 0x10)
 		// 2 register's value pointer ([AX] = [0x10])
 		// 3 value of memory address ([0x10] or [LABEL])
 
 		uint8_t indices = 0;
+
+		// Size values (1 byte)
+		// 0 byte
+		// 1 word
+		// 2 dword
+
+		uint8_t sizes = 0;
 
 		char* section = malloc(sizeof(sections[i+1])); // Original section
 		char* section_clean = malloc(sizeof(sections[i+1])); // Removed extraneous characters
@@ -135,6 +145,16 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 			removeCharacter(section_clean, '[');
 			removeCharacter(section_clean, ']');
 			
+			// Check if section is size specifier
+			bool is_size = false;
+			for (int s = 0; s < SIZE_T_MAX; s++){
+				if (strcmp(section_clean, SIZE_T_NAMES[s]) == 0){
+					sizes |= s << i * 4;
+					is_size = true;
+					break;
+				}
+			}
+
 			// Index of this section
 			uint8_t singular_index = 0;
 
@@ -183,10 +203,13 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 			}
 
 			// Set the values of the result token
-			if (i == 0)
+			if (value_count == 0 && !is_size){
 				result.value1 = value;
-			else if (i == 1)
+				value_count++;
+			} else if (value_count == 1 && !is_size){
 				result.value2 = value;
+				value_count++;
+			}
 
 			// Add current index into final index byte
 			indices |= singular_index << i * 4;
@@ -196,10 +219,11 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		free(section);
 		free(section_clean);
 		
-		// Write the final indices into the higher byte of the result's operation
+		// Write information about operation
 		result.operation |= indices << 8;
+		result.operation |= sizes << 16;
 
-		printf("OPERATION: %04X VALUE1: %08X VALUE2: %08X [LINE: %s]\n", result.operation, result.value1, result.value2, line);
+		printf("OPERATION: %08X INDICES: %04X SIZES: %04X VALUE1: %08X VALUE2: %08X [LINE: %s]\n", result.operation, indices, sizes, result.value1, result.value2, line);
 	}
 
 	return result;

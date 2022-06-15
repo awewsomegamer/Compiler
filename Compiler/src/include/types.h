@@ -7,6 +7,14 @@
 
 #include <stdint.h>
 
+static const char* SIZE_T_NAMES[] = {"byte", "word", "dword"};
+typedef enum{
+	BYTE,
+	WORD,
+	DWORD,
+	SIZE_T_MAX
+} SIZE_T;
+
 static const char* REGISTER_T_NAMES[] = {"ax", "al", "ah", "bx", "bl", "bh", "cx", "cl", "ch", "dx", "dl", "dh", "ip", "sp", "bp", "i1", "i2", "i3", "i4"};
 typedef enum {
 	A = 0x10,

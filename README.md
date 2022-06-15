@@ -64,6 +64,13 @@ All bytes result in a value that is greater than or equal to 0, the only time a 
 -
 </pre>
 
+## Syntax
+INSTRUCTION SIZE VALUE, SIZE VALUE <br>
+INSTRUCTION: One of the instructions from the next section <br>
+SIZE: byte, word, dword <br>
+VALUE: A register, integer, or pointer <br>
+
+
 ## Instructions
 <pre>
 

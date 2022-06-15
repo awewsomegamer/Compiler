@@ -56,6 +56,7 @@ int main(int argc, char* argv[]){
 		removeCharacter(line, '\n');
 		removeCharacter(line, '\r');
 		removeCharacter(line, ' ');
+		
 
 		// Remove comments
 		int semcol_index = 0;
