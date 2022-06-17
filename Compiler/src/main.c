@@ -8,14 +8,49 @@
 #include <types.h>
 #include <lexer.h>
 
+// Combine all given inputs into one output
+void generate_assemblery(char* argv[], int i, int size){
+	FILE* assemblery = fopen("assemblery.asm", "w");
+	FILE* assemblees[size];
+	int a_i = 0;
+	int i_prev = i;
+
+	// Read and open all files
+	for (; i < size; i++)
+		if (!startsWith(argv[i], "-"))
+			assemblees[a_i++] = fopen(argv[i], "r");
+
+	char line[LINE_SIZE];
+	
+	for (int j = 0; j < a_i; j++) {
+		if (assemblees[j] != NULL){
+			// If input is not null, then print it to assemblery (big main file) like this
+			// ; path/of/assembly.file
+			// file contents
+			// \n
+			// and then close it
+
+			fprintf(assemblery, "; %s\n", argv[i_prev + j + 1]);
+
+			while (fgets(line, sizeof(line), assemblees[j]))
+				fprintf(assemblery, "%s", line);
+
+			fprintf(assemblery, "\n");
+
+			fclose(assemblees[j]);
+		}
+	}
+
+	fclose(assemblery);
+}
+
 int main(int argc, char* argv[]){
 	FILE* in_file;
-	char* in_file_name = malloc(LINE_SIZE);
+	char* in_file_name = "assemblery.asm";
 	bool in_file_set = false;
 
 	FILE* out_file;
 	bool out_file_set = false;
-
 
 	// Interpret arguments
 	for (int i = 1; i < argc; i++){
@@ -25,8 +60,8 @@ int main(int argc, char* argv[]){
 		}
 
 		if (startsWith(argv[i], "-i")){
-			in_file = fopen(argv[i+1], "r");
-			strcpy(in_file_name, argv[i+1]);
+			generate_assemblery(argv, i, argc);
+			in_file = fopen(in_file_name, "r");
 			in_file_set = true;
 		}
 	}
@@ -172,14 +207,13 @@ int main(int argc, char* argv[]){
 	if (!out_file_set){
 		char* name = malloc(strlen(in_file_name)+4);
 		sprintf(name, "%s.out", in_file_name);
-		
 		out_file = fopen(name, "w");
 		free(name);
 	}
 
 	// Write bytes
 	instruction_index = 0;
-	for (; instruction_index < file_length + 1; instruction_index++){
+	for (; instruction_index < file_length; instruction_index++){
 			// printf("%d\n", instructions[instruction_index].operation & 0xFF);
 		if (instructions[instruction_index].operation > ENDFILE){
 			putw((int)instructions[instruction_index].operation, out_file);
@@ -197,6 +231,9 @@ int main(int argc, char* argv[]){
 			fputs(definitions[instructions[instruction_index].value1], out_file);
 		}
 	}
+
+	fclose(out_file);
+	fclose(in_file);
 
 	return 0;
 }
