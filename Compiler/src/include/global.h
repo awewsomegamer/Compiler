@@ -1,7 +1,6 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define INSTRUCTION_SIZE_BYTES 12
 #define LINE_SIZE 256
 #define MAX_LABELS 256
 

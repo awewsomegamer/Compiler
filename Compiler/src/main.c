@@ -215,23 +215,23 @@ int main(int argc, char* argv[]){
 	instruction_index = 0;
 
 	for (; instruction_index < file_length; instruction_index++){
-		printf("%d\n", instructions[instruction_index].operation & 0xFF);
-	// 		// printf("%d\n", instructions[instruction_index].operation & 0xFF);
-	// 	if (instructions[instruction_index].operation > ENDFILE){
-	// 		putw((int)instructions[instruction_index].operation, out_file);
-	// 		putw((int)instructions[instruction_index].value1, out_file);
-	// 		putw((int)instructions[instruction_index].value2, out_file);
-	// 	}
+		// printf("%d\n", instructions[instruction_index].operation & 0xFF);
+		// printf("%d\n", instructions[instruction_index].operation & 0xFF);
+		if (instructions[instruction_index].operation > ENDFILE){
+			fwrite(&instructions[instruction_index].operation, 2, 1, out_file);
+			fwrite(&instructions[instruction_index].value1, sizeInBytes(instructions[instruction_index].value1) + 1, 1, out_file);
+			fwrite(&instructions[instruction_index].value2, sizeInBytes(instructions[instruction_index].value2) + 1, 1, out_file);
+		}
 		
-	// 	if (instructions[instruction_index].operation == DEFINITION_STRING){
-	// 		fputs(definitions[instructions[instruction_index].value1], out_file);
-	// 		// fputc(0, out_file);
-	// 	}
+		if (instructions[instruction_index].operation == DEFINITION_STRING){
+			fputs(definitions[instructions[instruction_index].value1], out_file);
+			// fputc(0, out_file);
+		}
 		
-	// 	if (instructions[instruction_index].operation == DEFINITION_BYTES){
-	// 		// printf("%c\n", definitions[instructions[instruction_index].value1][0]);
-	// 		fputs(definitions[instructions[instruction_index].value1], out_file);
-	// 	}
+		if (instructions[instruction_index].operation == DEFINITION_BYTES){
+			// printf("%c\n", definitions[instructions[instruction_index].value1][0]);
+			fputs(definitions[instructions[instruction_index].value1], out_file);
+		}
 	}
 
 	fclose(out_file);
