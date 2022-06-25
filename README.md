@@ -18,7 +18,7 @@ Indices: Describes the type of arguments
 
 Bits:
 
-  OP CODE    L1 L2 I1 I2
+  OP CODE    L2 L1 I2 I1
 00 00 00 00  00 00 00 00 ...
 
 OP CODE: 256 different values

@@ -52,6 +52,18 @@ int strToBinary(char* line){
 	return result/2;
 }
 
+// Returns the number of bytes the number uses - 1
+int sizeInBytes(int v){
+	int i = 0;
+
+	while (v != 0){
+		v >>= 8;
+		if (v != 0) i++;
+	}
+
+	return i;
+}
+
 uint64_t hashStr(char* str){
 	uint64_t hash = 559669;
 

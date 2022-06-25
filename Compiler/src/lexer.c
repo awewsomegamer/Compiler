@@ -62,14 +62,14 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		strcpy(sections+i, section_buffer);
 		memset(section_buffer, 0, LINE_SIZE);
 
-
 		// Check operation (sections[0])
+		uint16_t operation = 0;
 		for (int i = 0; i < sizeof(OPERATION_T_NAMES)/sizeof(OPERATION_T_NAMES[0]); i++){
 			// printf("-- %s --\n", line);
 			// printf("%s -> %s [%d, %d]\n\n", sections[0], OPERATION_T_NAMES[i], i, strcmp(sections[0], OPERATION_T_NAMES[i]));
 
 			if (strcmp(sections[0], OPERATION_T_NAMES[i]) == 0){
-				result.operation = i;
+				operation = i;
 				break;
 			}
 		}
@@ -111,7 +111,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		// 1 word
 		// 2 dword
 
-		uint8_t sizes = 0;
+		// uint8_t sizes = 0;
 
 		char* section = malloc(sizeof(sections[i+1])); // Original section
 		char* section_clean = malloc(sizeof(sections[i+1])); // Removed extraneous characters
@@ -128,14 +128,14 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 			removeCharacter(section_clean, ']');
 			
 			// Check if section is size specifier
-			bool is_size = false;
-			for (int s = 0; s < SIZE_T_MAX; s++){
-				if (strcmp(section_clean, SIZE_T_NAMES[s]) == 0){
-					sizes |= s << i * 4;
-					is_size = true;
-					break;
-				}
-			}
+			// bool is_size = false;
+			// for (int s = 0; s < SIZE_T_MAX; s++){
+			// 	if (strcmp(section_clean, SIZE_T_NAMES[s]) == 0){
+			// 		sizes |= s << i * 4;
+			// 		is_size = true;
+			// 		break;
+			// 	}
+			// }
 
 			// Index of this section
 			uint8_t singular_index = 0;
@@ -185,16 +185,16 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 			}
 
 			// Set the values of the result token
-			if (value_count == 0 && !is_size){
+			if (value_count == 0){
 				result.value1 = value;
 				value_count++;
-			} else if (value_count == 1 && !is_size){
+			} else if (value_count == 1){
 				result.value2 = value;
 				value_count++;
 			}
 
 			// Add current index into final index byte
-			indices |= singular_index << i * 4;
+			indices |= singular_index << (i * 2);
 		}
 
 		// When done, free sections
@@ -202,10 +202,26 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		free(section_clean);
 		
 		// Write information about operation
-		result.operation |= indices << 8;
-		result.operation |= sizes << 16;
+		operation |= indices << 8; // Indices
 
-		printf("OPERATION: %08X INDICES: %04X SIZES: %04X VALUE1: %08X VALUE2: %08X [LINE: %s]\n", result.operation, indices, sizes, result.value1, result.value2, line);
+		printf("SIZE IN BYTES V1: %d V2: %d\n", sizeInBytes(result.value1), sizeInBytes(result.value2));
+
+		operation |= sizeInBytes(result.value1) << 12; // Arg 1 size
+		operation |= sizeInBytes(result.value2) << 10; // Arg 2 size
+
+		result.operation = operation;
+		// result.operation |= sizes << 16;
+
+		//SIZES: %04X sizes
+		printf("OP_BITS: ");
+
+		for (int b = 15; b >= 0; b--){
+			printf("%c", (((operation >> b) & 1) ? '1' : '0'));
+			if (b % 8 == 0 && b != 0) printf(" ");
+		}
+
+		printf(" OPERATION: %04X INDICES: %04X VALUE1: %08X VALUE2: %08X [LINE: %s]", result.operation & 0xFF, indices, result.value1, result.value2, line);
+		printf("\n");
 	}
 
 	return result;
