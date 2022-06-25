@@ -15,20 +15,7 @@ typedef enum{
 	SIZE_T_MAX
 } SIZE_T;
 
-static const char* REGISTER_T_NAMES[] = {"ax", "al", "ah", "bx", "bl", "bh", "cx", "cl", "ch", "dx", "dl", "dh", "ip", "sp", "bp", "i1", "i2", "i3", "i4"};
-typedef enum {
-	A = 0x10,
-	B = 0x20,
-	C = 0x30,
-	D = 0x40,
-	IP = 0x50,
-	SP = 0x60,
-	BP = 0x70,
-	I1 = 0x80,
-	I2 = 0x90,
-	I3 = 0xA0,
-	I4 = 0xB0
-} REGISTER_T;
+static const char* REGISTER_T_NAMES[] = {"ax", "bx", "cx", "dx", "ip", "sp", "bp", "i1", "i2", "i3", "i4"};
 
 static const char* OPERATION_T_NAMES[] = {"nop", "mov", "sub", "add", 
 										  "div", "mul", "and", "or", 

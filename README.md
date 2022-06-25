@@ -5,18 +5,28 @@ Bytes are organized in this fashion
 <pre>
 OPERATION CODE (8 bits), REGISTER MASK (8 bits), VALUE 1 (32 bits), VALUE 2 (32 bits)
 
-Diagram (Little Endian)
+Diagram of largest instruction (Little Endian):
 
-0           8        12       16           48           80
-+-----------+--------+--------+------------+------------+
-| OPERATION | MASK 2 | MASK 1 | ARGUMENT 1 | ARGUMENT 2 |
-+-----------+--------+--------+------------+------------+
+0           8         12        16           48           80
++-----------+---------+---------+------------+------------+
+| OPERATION | LENGHTS | INDICES | ARGUMENT 1 | ARGUMENT 2 |
++-----------+---------+---------+------------+------------+
 
 Operation: The operation to preform
-Mask 1: Describes what the first argument is (see Register mask values and descriptions)
-Mask 2: Describes what the second argument is (see Register mask values and descriptions)
-Argument 1: The first argument
-Argument 2: The second argument
+Lengths: Describes the length of the arguments in bytes
+Indices: Describes the type of arguments
+
+Bits:
+
+  OP CODE    L1 L2 I1 I2
+00 00 00 00  00 00 00 00 ...
+
+OP CODE: 256 different values
+L1: 0 - 3 (Length of the first argument in bytes - 1)
+L2: 0 - 3 (Length of the second argument in bytes - 1)
+I1: 0 - 3 (Description of the first argument)
+I2: 0 - 3 (Description of the second argument)
+... 32 bit compressed arguments
 
 </pre>
 All bytes result in a value that is greater than or equal to 0, the only time a byte will be -1 is when the end of the program is reached.

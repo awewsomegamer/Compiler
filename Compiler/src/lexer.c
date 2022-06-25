@@ -3,28 +3,10 @@
 #include <util.h>
 
 // Check if given name is a register, return it's value if so, otherwise return -1
-REGISTER_T indexRegister(char* name){
+uint8_t indexRegister(char* name){
 	for (int i = 0; i < sizeof(REGISTER_T_NAMES)/sizeof(REGISTER_T_NAMES[0]); i++){
 		if (strcmp(name, REGISTER_T_NAMES[i]) == 0){
-			// Ending
-			// X = FULL
-			// L = /2
-			// H = -1
-
-			// ABCD registers
-			if (i < 12){
-				int index = (i / 3) * 0x10;
-
-				switch((int)*(name+1)){
-				case 'x': return index;
-				case 'l': return index/2;
-				case 'h': return index-1;
-				}
-			}
-
-			if (i >= 12)
-				return (i - 7) * 0x10;
-
+			return i;
 			break;
 		}
 	}

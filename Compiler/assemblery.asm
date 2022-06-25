@@ -1,4 +1,4 @@
-; ./part_a.asm
+; part_a.asm
 mov bx, MY_STRING 
 
 print_string:
@@ -18,7 +18,7 @@ print_string:
 print_end:
 	jmp print_end
 
-; ./part_b.asm
+; part_b.asm
 MY_STRING:
 	ds "HELLO WORLD"
 	db 0x0
