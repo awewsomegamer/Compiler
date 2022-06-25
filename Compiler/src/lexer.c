@@ -113,16 +113,16 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 
 		// uint8_t sizes = 0;
 
-		char* section = malloc(sizeof(sections[i+1])); // Original section
-		char* section_clean = malloc(sizeof(sections[i+1])); // Removed extraneous characters
+		char* section = malloc(LINE_SIZE); // Original section
+		char* section_clean = malloc(LINE_SIZE); // Removed extraneous characters
 
-		for (int i = 0; i < space_index; i++){
+		for (int i = 1; i < space_index; i++){
 			// Clear sections
 			memset(section, 0, sizeof(section));
 			memset(section_clean, 0, sizeof(section));
 
-			strcpy(section, sections[i+1]);
-			strcpy(section_clean, sections[i+1]);
+			strcpy(section, sections[i]);
+			strcpy(section_clean, sections[i]);
 
 			removeCharacter(section_clean, '[');
 			removeCharacter(section_clean, ']');
@@ -193,6 +193,8 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 				value_count++;
 			}
 
+			// printf("I:%d INDEX:%d %s\n", i, singular_index, sections[i]);
+
 			// Add current index into final index byte
 			indices |= singular_index << (i * 2);
 		}
@@ -204,21 +206,21 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		// Write information about operation
 		operation |= indices << 8; // Indices
 
-		printf("SIZE IN BYTES V1: %d V2: %d\n", sizeInBytes(result.value1), sizeInBytes(result.value2));
-
 		operation |= sizeInBytes(result.value1) << 12; // Arg 1 size
-		operation |= sizeInBytes(result.value2) << 10; // Arg 2 size
+		operation |= sizeInBytes(result.value2) << 14; // Arg 2 size
+
+		// printf("SIZE IN BYTES V1: %d V2: %d\n", sizeInBytes(result.value1), sizeInBytes(result.value2));
+
+		printf("OP_BITS: ");
+		for (int b = 15; b >= 0; b--){
+			printf("%c", (((operation >> b) & 1) ? '1' : '0'));
+			if (b % 8 == 0 && b != 0) printf(" ");
+		}
 
 		result.operation = operation;
 		// result.operation |= sizes << 16;
 
 		//SIZES: %04X sizes
-		printf("OP_BITS: ");
-
-		for (int b = 15; b >= 0; b--){
-			printf("%c", (((operation >> b) & 1) ? '1' : '0'));
-			if (b % 8 == 0 && b != 0) printf(" ");
-		}
 
 		printf(" OPERATION: %04X INDICES: %04X VALUE1: %08X VALUE2: %08X [LINE: %s]", result.operation & 0xFF, indices, result.value1, result.value2, line);
 		printf("\n");
