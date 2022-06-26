@@ -267,8 +267,16 @@ int main(int argc, char* argv[]){
 
 		if (operation > ENDFILE && operation < DEFINITION_STRING){
 			fwrite(&instructions[i].operation, 2, 1, out_file);
-			fwrite(&instructions[i].value1, sizeInBytes(instructions[i].value1) + 1, 1, out_file);
-			fwrite(&instructions[i].value2, sizeInBytes(instructions[i].value2) + 1, 1, out_file);
+
+			uint8_t info_block = (instructions[i].operation >> 8) & 0xFF;
+			int size1 = ((info_block >> 4)& 0b11) + 1;
+			int size2 = ((info_block >> 6)& 0b11) + 1;
+
+			if (OPERATION_T_ARGC[operation] == 1 || OPERATION_T_ARGC[operation] == 2)
+				fwrite(&instructions[i].value1, size1, 1, out_file);
+
+			if (OPERATION_T_ARGC[operation] == 2)
+				fwrite(&instructions[i].value2, size2, 1, out_file);
 
 			if (_debug_msg) printf("WROTE: %04X (%s)\n", instructions[i].operation, OPERATION_T_NAMES[instructions[i].operation & 0xFF]);
 		}
