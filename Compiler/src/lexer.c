@@ -175,6 +175,8 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		char section[LINE_SIZE]; // Original section
 		char section_clean[LINE_SIZE]; // Removed extraneous characters
 
+		int fixed_sizes[2];
+
 		for (int i = 1; i <= space_index; i++){
 			// Clear sections
 			memset(section, 0, sizeof(section));
@@ -201,6 +203,9 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 
 			// Try to index register
 			uint32_t value = indexRegister(section_clean);
+
+			// Fixed size of value in output (bytes)
+			int fixed_size = -1;
 
 			// If register is found, set the current index accordingly
 			if (value != -1)
@@ -240,17 +245,26 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 
 				value = label.value;
 				
+				fixed_size = 4;
+
 				// If label is found, set the index accordingly (pointer or plain value)
 				if (value != -1)
 					singular_index = (*section == '[' ? 3 : 0);
 			}
 
+			// Undefined reference
+			if (value == -1)
+				fatal_err("Undefined reference to <%s> on line <%d>", sections[i], _line);
+			
+
 			// Set the values of the result token
 			if (value_count == 0){
 				result.value1 = value;
+				fixed_sizes[0] = fixed_size;
 				value_count++;
 			} else if (value_count == 1){
 				result.value2 = value;
+				fixed_sizes[1] = fixed_size;
 				value_count++;
 			}
 
@@ -262,8 +276,8 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		
 		// Write information about operation
 		operation |= indices << 6; // Indices
-		operation |= sizeInBytes(result.value1) << 12; // Arg 1 size
-		operation |= sizeInBytes(result.value2) << 14; // Arg 2 size
+		operation |= ((fixed_sizes[0] == -1) ? (sizeInBytes(result.value1) << 12) : ((fixed_sizes[0] - 1) << 12)); // Arg 1 size
+		operation |= ((fixed_sizes[0] == -1) ? (sizeInBytes(result.value2) << 12) : ((fixed_sizes[1] - 1) << 14)); // Arg 2 size
 
 		// printf("SIZE IN BYTES V1: %d V2: %d\n", sizeInBytes(result.value1), sizeInBytes(result.value2));
 

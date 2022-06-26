@@ -8,9 +8,21 @@
 #include <types.h>
 #include <lexer.h>
 
+int _line = 0;
 char original_line[LINE_SIZE];
 // char*** definitions = NULL;
 // int definition_index = 0;
+
+void fatal_err(char* message, ...){
+	va_list args;
+	va_start(args, message);
+	
+	printf("FATAL: ");
+	vprintf(message, args);
+	printf("\n");
+
+	exit(1);
+}
 
 // Combine all given inputs into one output
 void generate_assemblery(char* argv[], int i, int size){
@@ -83,62 +95,79 @@ int main(int argc, char* argv[]){
 	char line[LINE_SIZE];
 
 	HASHMAP_ELEMENT_T label_map[MAX_LABELS];
-	int address_count = 0; // Current address
 
 	// Look for lines ending in ':' - labels.
 	while (fgets(line, sizeof(line), in_file)){
-		// Clean line
-		strcpy(original_line, line);
-
-		// Find label
-		removeCharacter(line, '\t');
 		removeCharacter(line, '\n');
+		removeCharacter(line, '\t');
 		removeCharacter(line, ' ');
 
-		// Remove comments
-		int semcol_index = 0;
-		for (; semcol_index < LINE_SIZE; semcol_index++)
-			if (*(line+semcol_index) == ';')
-				break;
+		if (endsWith(line, ':')){
+			removeCharacter(line, ':');
+
+			printf("FOUND LABEL %s\n", line);
+
+			mapPut(label_map, line, 0);
+		}
+	}
 	
-		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));
+	rewind(in_file);
+
+	// Define addresses of labels
+	int address_count = 0; // Current address
+	while (fgets(line, sizeof(line), in_file)){
+		_line++;
+
+		strcpy(original_line, line);
+
+		removeCharacter(line, '\n');
+		removeCharacter(line, '\t');
+		removeCharacter(line, ' ');
 
 		if (endsWith(line, ':')){
-			printf("LABEL: %s ADDRESS: %X\n", line, address_count);
-
 			removeCharacter(line, ':');
+
+			printf("FOUND LABEL %s, ADDRESSED AT %X\n", line, address_count);
+
 			mapPut(label_map, line, address_count);
 		}
 
-		// Calculate address
-		
 		strcpy(line, original_line);
-		removeCharacter(line, '\t');
 		removeCharacter(line, '\n');
-
-		// Remove comments
-		semcol_index = 0;
-		for (; semcol_index < LINE_SIZE; semcol_index++)
-			if (*(line+semcol_index) == ';')
-				break;
-
-		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));
+		removeCharacter(line, '\t');
 
 		TOKEN_T instruction = tokenize(line, label_map);
+		int operation = instruction.operation & 0xFF;
 
-		printf("%d\n", OPERATION_T_ARGC[instruction.operation]);
-
-		if (OPERATION_T_ARGC[instruction.operation] == 0)
+		switch (OPERATION_T_ARGC[operation]){
+		case 0:
 			address_count++;
+			break;
 
-		if (OPERATION_T_ARGC[instruction.operation] == 1)
-			address_count += 2 + (sizeInBytes(instruction.value1) + 1);
+		case 1: {
+			uint8_t info_block = instruction.operation & 0xFF00;
+			int size = (info_block & 0b00110000) + 1;
+			address_count += size + 2;
 
-		if (OPERATION_T_ARGC[instruction.operation] == 2)
-			address_count += 2 + (sizeInBytes(instruction.value1) + sizeInBytes(instruction.value2) + 2);
+			break;
+		}
 
-		if (instruction.operation == DEFINITION_BYTES || instruction.operation == DEFINITION_STRING)
-			address_count += sizeof(instruction.extra_bytes);
+		case 2: {
+			uint8_t info_block = instruction.operation & 0xFF00;
+			int size = (info_block & 0b00110000) + (info_block & 0b11000000) + 2;
+			address_count += size + 2;
+
+			break;
+		}
+
+		case 3:
+			if (operation == DEFINITION_BYTES)
+				address_count += instruction.value1;
+			else if (operation == DEFINITION_STRING)
+				address_count += strlen(instruction.extra_bytes);
+			
+			break;
+		}
 	}
 	
 	rewind(in_file);
@@ -149,9 +178,12 @@ int main(int argc, char* argv[]){
 	int instruction_index = 0;
 	
 	printf("------ REAL COMPILE ------\n");
+	_line = 0;
 
 	// Parse instructions and or definitions and put them into their respective arrays
 	while (fgets(line, sizeof(line), in_file)){
+		_line++;
+
 		strcpy(original_line, line);
 
 		// Skip labels
@@ -167,9 +199,8 @@ int main(int argc, char* argv[]){
 
 		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));
 
-		if (endsWith(line, ':') || strlen(line) == 0)
+		if (endsWith(line, ':') || strlen(line) == 0) 
 			continue;
-
 
 		strcpy(line, original_line);
 		removeCharacter(line, '\n');
