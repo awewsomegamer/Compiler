@@ -25,7 +25,20 @@ static const char* OPERATION_T_NAMES[] = {"nop", "mov", "sub", "add",
 										  "jge", "jl", "jle", "jz", "jnz", 
 										  "jc", "jnc", "ret", "inc", "push", 
 										  "pop", "inb", "inw", "ind", "outb", 
-										  "outw", "outd"};
+										  "outw", "outd", "ds", "db"};
+
+static const uint8_t OPERATION_T_ARGC[] = {
+	0, 2, 2, 2,
+	2, 2, 2, 2,
+	2, 1, 2, 2,
+	2, 2, 1, 1,
+	1, 2, 1, 1, 1,
+	1, 1, 1, 1, 1,
+	1, 1, 0, 1, 1,
+	1, 2, 2, 2, 2,
+	2, 2, 3, 3
+};
+
 typedef enum {
 		NOP = 0,
 		MOV,
@@ -65,9 +78,9 @@ typedef enum {
 		OUTB,
 		OUTW,
 		OUTD,
-		ENDFILE = -1,
-		DEFINITION_STRING = -2,
-		DEFINITION_BYTES = -3
+		DEFINITION_STRING,
+		DEFINITION_BYTES,
+		ENDFILE = -1
 } OPERATION_T;
 
 typedef struct {

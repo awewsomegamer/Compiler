@@ -1,5 +1,5 @@
 ; part_a.asm
-mov bx, MY_STRING 
+mov bx, MY_STRING
 
 print_string:
 	mov ax, [bx]

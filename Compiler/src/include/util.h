@@ -10,6 +10,7 @@ bool containsCharacter(char* line, char c);
 bool endsWith(char* line, char c);
 bool isNumber(char* line);
 int strToBinary(char* line);
+void printBinary(int v);
 int sizeInBytes(int v);
 uint64_t hashStr(char* str);
 void removeCharacter(char* line, char c);

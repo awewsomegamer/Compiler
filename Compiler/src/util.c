@@ -52,6 +52,14 @@ int strToBinary(char* line){
 	return result/2;
 }
 
+// Prints number in binary from highesy byte to lowest byte
+void printBinary(int v){
+	for (int b = ((sizeInBytes(v) + 1) * 8) - 1; b >= 0; b--){
+		printf("%c", (((v >> b) & 1) ? '1' : '0'));
+		if (b % 8 == 0 && b != 0) printf(" ");
+	}
+}
+
 // Returns the number of bytes the number uses - 1
 int sizeInBytes(int v){
 	int i = 0;
@@ -96,7 +104,7 @@ void mapPut(HASHMAP_ELEMENT_T map[], char* id, int value){
 	element.id = id;
 	element.value = value;
 
-	map[hashStr(id) % MAX_LABELS] =  element;
+	map[hashStr(id) % MAX_LABELS] = element;
 }
 
 HASHMAP_ELEMENT_T mapGet(HASHMAP_ELEMENT_T map[], char* id){

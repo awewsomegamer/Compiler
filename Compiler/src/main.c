@@ -8,6 +8,10 @@
 #include <types.h>
 #include <lexer.h>
 
+char original_line[LINE_SIZE];
+// char*** definitions = NULL;
+// int definition_index = 0;
+
 // Combine all given inputs into one output
 void generate_assemblery(char* argv[], int i, int size){
 	FILE* assemblery = fopen("assemblery.asm", "w");
@@ -78,20 +82,82 @@ int main(int argc, char* argv[]){
 
 	char line[LINE_SIZE];
 
-	int address_count = 0; // Measured in 4 bytes (each instruction is a 32 bit int)
-
 	HASHMAP_ELEMENT_T label_map[MAX_LABELS];
+	int address_count = 0; // Current address
 
 	// Look for lines ending in ':' - labels.
 	while (fgets(line, sizeof(line), in_file)){
-		char* original_line = strdup(line);
-
 		// Clean line
+		strcpy(original_line, line);
+
+		// Find label
 		removeCharacter(line, '\t');
 		removeCharacter(line, '\n');
-		removeCharacter(line, '\r');
 		removeCharacter(line, ' ');
+
+		// Remove comments
+		int semcol_index = 0;
+		for (; semcol_index < LINE_SIZE; semcol_index++)
+			if (*(line+semcol_index) == ';')
+				break;
+	
+		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));
+
+		if (endsWith(line, ':')){
+			printf("LABEL: %s ADDRESS: %X\n", line, address_count);
+
+			removeCharacter(line, ':');
+			mapPut(label_map, line, address_count);
+		}
+
+		// Calculate address
 		
+		strcpy(line, original_line);
+		removeCharacter(line, '\t');
+		removeCharacter(line, '\n');
+
+		// Remove comments
+		semcol_index = 0;
+		for (; semcol_index < LINE_SIZE; semcol_index++)
+			if (*(line+semcol_index) == ';')
+				break;
+
+		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));
+
+		TOKEN_T instruction = tokenize(line, label_map);
+
+		printf("%d\n", OPERATION_T_ARGC[instruction.operation]);
+
+		if (OPERATION_T_ARGC[instruction.operation] == 0)
+			address_count++;
+
+		if (OPERATION_T_ARGC[instruction.operation] == 1)
+			address_count += 2 + (sizeInBytes(instruction.value1) + 1);
+
+		if (OPERATION_T_ARGC[instruction.operation] == 2)
+			address_count += 2 + (sizeInBytes(instruction.value1) + sizeInBytes(instruction.value2) + 2);
+
+		if (instruction.operation == DEFINITION_BYTES || instruction.operation == DEFINITION_STRING)
+			address_count += sizeof(instruction.extra_bytes);
+	}
+	
+	rewind(in_file);
+
+	TOKEN_T instructions[file_length + 1];
+	char* definitions[file_length + 1][LINE_SIZE];
+	
+	int instruction_index = 0;
+	
+	printf("------ REAL COMPILE ------\n");
+
+	// Parse instructions and or definitions and put them into their respective arrays
+	while (fgets(line, sizeof(line), in_file)){
+		strcpy(original_line, line);
+
+		// Skip labels
+		removeCharacter(line, '\n');
+		removeCharacter(line, '\t');
+		removeCharacter(line, ' ');
 
 		// Remove comments
 		int semcol_index = 0;
@@ -101,106 +167,23 @@ int main(int argc, char* argv[]){
 
 		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));
 
-		if (endsWith(line, ':')){
-			printf("%s %X\n", line, address_count);
+		if (endsWith(line, ':') || strlen(line) == 0)
+			continue;
 
-			removeCharacter(line, ':');
-			mapPut(label_map, line, address_count);
-		}
 
-		// Only increment address if the line is a valid operation
-		for (int i = 0; i < sizeof(OPERATION_T_NAMES)/sizeof(OPERATION_T_NAMES[0]); i++){
-			if (startsWith(line, OPERATION_T_NAMES[i]) || startsWith(line, "db") || startsWith(line, "ds")){
-				address_count += INSTRUCTION_SIZE_BYTES;
-				break;
-			}
-		}
-	}
-
-	rewind(in_file);
-
-	TOKEN_T instructions[file_length + 1];
-	char* definitions[file_length + 1][LINE_SIZE];
-	
-	int instruction_index = 0;
-	int definition_index = 0;
-
-	// Parse instructions and or definitions and put them into their respective arrays
-	while (fgets(line, sizeof(line), in_file)){
-		char* original_line = strdup(line);
-
+		strcpy(line, original_line);
 		removeCharacter(line, '\n');
 		removeCharacter(line, '\t');
 
-		int semcol_index = 0;
+		// Remove comments
+		semcol_index = 0;
 		for (; semcol_index < LINE_SIZE; semcol_index++)
 			if (*(line+semcol_index) == ';')
 				break;
 
-		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));
+		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));		
 
-		instructions[instruction_index] = tokenize(line, label_map);
-		
-		// Check if bytes are being defined
-		if (startsWith(line, "db ")){
-			// db 0x0, 0xA, 0xD
-			
-			char* current_byte_string = malloc(4);
-			int current_byte_string_idx = 0;
-			int bytes_size = 1;
-			
-			for (int i = 0; i < strlen(line); i++) 
-				if (*(line + i) == ',') 
-					bytes_size++;
-
-			printf("%d", bytes_size);
-
-			uint8_t bytes[bytes_size];
-			int byte_ptr = 0;
-
-			for (int i = 2; i < strlen(line); i++){
-				if (*(line + i) != ',')
-					*(current_byte_string + current_byte_string_idx++) = *(line + i);
-				
-				if (*(line + i) == ',' || i >= strlen(line) - 1){
-					bytes[byte_ptr] = strtol(current_byte_string, NULL, 16);
-					printf("%s\n", current_byte_string);
-					byte_ptr++;
-					current_byte_string_idx = 0;
-				}
-			}
-			
-			strncpy(definitions[definition_index], bytes, bytes_size);
-
-			TOKEN_T def_token;
-			def_token.operation = DEFINITION_BYTES;
-			def_token.value1 = definition_index;
-			instructions[instruction_index] = def_token;
-
-			definition_index++;
-
-			free(current_byte_string);
-		}
-
-		// Check if a string is being defined
-		if (startsWith(line, "ds ")){
-			int org_ln_quote = 0;
-
-			for (; org_ln_quote < strlen(original_line); org_ln_quote++)
-				if (*(original_line + org_ln_quote) == '\"')
-					break;
-
-			strncpy(definitions[definition_index], original_line + org_ln_quote + 1, strlen(original_line) - (org_ln_quote * 1.75));
-
-			TOKEN_T def_token;
-			def_token.operation = DEFINITION_STRING;
-			def_token.value1 = definition_index;
-			instructions[instruction_index] = def_token;
-
-			definition_index++;
-		}
-
-		instruction_index++;
+		instructions[instruction_index++] = tokenize(line, label_map);
 	}
 
 	// If not out file is set, then an outfile will be generated with the in file's name + ".out"
@@ -212,25 +195,25 @@ int main(int argc, char* argv[]){
 	}
 
 	// Write bytes
-	instruction_index = 0;
+	for (int i = 0; i < instruction_index; i++){
+		int operation = instructions[i].operation & 0xFF;
 
-	for (; instruction_index < file_length; instruction_index++){
-		// printf("%d\n", instructions[instruction_index].operation & 0xFF);
-		// printf("%d\n", instructions[instruction_index].operation & 0xFF);
-		if (instructions[instruction_index].operation > ENDFILE){
-			fwrite(&instructions[instruction_index].operation, 2, 1, out_file);
-			fwrite(&instructions[instruction_index].value1, sizeInBytes(instructions[instruction_index].value1) + 1, 1, out_file);
-			fwrite(&instructions[instruction_index].value2, sizeInBytes(instructions[instruction_index].value2) + 1, 1, out_file);
+		if (operation > ENDFILE && operation < DEFINITION_STRING){
+			fwrite(&instructions[i].operation, 2, 1, out_file);
+			fwrite(&instructions[i].value1, sizeInBytes(instructions[i].value1) + 1, 1, out_file);
+			fwrite(&instructions[i].value2, sizeInBytes(instructions[i].value2) + 1, 1, out_file);
 		}
 		
-		if (instructions[instruction_index].operation == DEFINITION_STRING){
-			fputs(definitions[instructions[instruction_index].value1], out_file);
-			// fputc(0, out_file);
+		if (operation == DEFINITION_STRING){
+			fputs(instructions[i].extra_bytes, out_file);
+			printf("DEFINED: %s\n", instructions[i].extra_bytes);
 		}
 		
-		if (instructions[instruction_index].operation == DEFINITION_BYTES){
-			// printf("%c\n", definitions[instructions[instruction_index].value1][0]);
-			fputs(definitions[instructions[instruction_index].value1], out_file);
+		if (operation == DEFINITION_BYTES){
+			fwrite(instructions[i].extra_bytes, 1, instructions[i].value1, out_file);
+				
+			for (int j = 0; j < instructions[i].value1; j++)
+				printf("DEFINED BYTE: %X\n", instructions[i].extra_bytes[j]);
 		}
 	}
 

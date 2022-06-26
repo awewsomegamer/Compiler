@@ -8,4 +8,8 @@
 #include <stdio.h>
 #include <string.h>
 
+extern char original_line[LINE_SIZE];
+// extern char*** definitions;
+// extern int definition_index;
+
 #endif
