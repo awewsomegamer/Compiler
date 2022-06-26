@@ -1,6 +1,7 @@
 #include <lexer.h>
 #include <global.h>
 #include <util.h>
+#include <string.h>
 
 // Check if given name is a register, return it's value if so, otherwise return -1
 int indexRegister(char* name){
@@ -19,50 +20,44 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 
 	if (strlen(line) >= 1){
 		// Split line using the space character
-		int space_indices[LINE_SIZE];
-
 		int space_index = 0;
 
-		bool instruction_started = false;
-
-		for (int i = 0; i < strlen(line); i++){
-			if (*(line + i) != ' ') instruction_started = true;
-			else if (*(line + i) == ' ' && instruction_started) space_indices[space_index++] = i;
-		}
-
-		char* sections[space_index+1][strlen(line)];
-		char section_buffer[LINE_SIZE];
-
-		int last_index = 0;
-		int i = 0;
+		bool instruction_started = true;
+		char* sections[strlen(line) + 1];
+		char* section_buffer = malloc(strlen(line));
+		int sect_c_ptr = 0;
 		
-		// Clean up sections
-		for (; i < space_index; i++){
-			strncpy(section_buffer, line+last_index,  space_indices[i]-last_index);
-			last_index = space_indices[i];
+		// Terminate line with a space
+		char* string_sterm = malloc(strlen(line) + 1);
+		strcpy(string_sterm, line);
+		string_sterm[strlen(line)] = ' ';
 
-			removeCharacter(section_buffer, ' ');
-			removeCharacter(section_buffer, ',');
+		for (int i = 0; i < strlen(string_sterm); i++) {
+			char c = *(string_sterm + i);
 
-			strcpy(sections+i, section_buffer);
-			memset(section_buffer, 0, LINE_SIZE);
+			if (c != ' '){
+				instruction_started = true;
+			} else if (c == ' '){
+				instruction_started = false;
+
+				removeCharacter(section_buffer, ' ');
+				removeCharacter(section_buffer, ',');
+
+				sections[space_index] = strdup(section_buffer);
+
+				for (int j = 0; j < strlen(line); j++)
+					section_buffer[j] = '\0';
+
+				sect_c_ptr = 0;
+				space_index++;
+			}
+
+			if (instruction_started)
+				section_buffer[sect_c_ptr++] = c;
 		}
 
-		// Clean up last line
-		strncpy(section_buffer, line+last_index, strlen(line)-last_index);
-		last_index = space_indices[i];
-
-		removeCharacter(section_buffer, ' ');
-		removeCharacter(section_buffer, ',');
-
-		strcpy(sections+i, section_buffer);
-		memset(section_buffer, 0, LINE_SIZE);
-
-		// printf("SECTION: %s\n", sections[0]);
-
-		// printf("%s\n", line);
-		// for (int i = 0; i < space_index; i++)
-		// 	printf("[%d]: %s\n", i, sections[i]);
+		free(section_buffer);
+		free(string_sterm);
 
 		// Check operation (sections[0])
 		uint16_t operation = 0;
@@ -72,10 +67,11 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 
 			if (strcmp(sections[0], OPERATION_T_NAMES[i]) == 0){
 				operation = i;
+				
 				break;
 			}
 		}
-
+		
 		if (operation == INCLUDE){
 			// Include type
 			result.value1 = endsWith(sections[0], "#") ? 1 : 0; // Include type binary
@@ -99,7 +95,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		}
 
 		if (operation == DEFINITION_BYTES){
-			printf("PARSING BYTE DEFINITION [%s]\n", line);
+			if (_debug_msg) printf("PARSING BYTE DEFINITION [%s]\n", line);
 
 			// db 0x0, 0xA, 0xD
 			char current_byte_string[4];
@@ -120,7 +116,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 				
 				if (*(line + i) == ',' || i >= strlen(line) - 1){
 					result.extra_bytes[byte_ptr] = strtol(current_byte_string, NULL, 16);
-					printf("BYTE: %X\n", result.extra_bytes[byte_ptr]);
+					if (_debug_msg) printf("BYTE: %X\n", result.extra_bytes[byte_ptr]);
 					byte_ptr++;
 					current_byte_string_idx = 0;
 				}
@@ -133,7 +129,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		}
 
 		if (operation == DEFINITION_STRING){
-			printf("PARSING STRING DEFINITION [%s]\n", line);
+			if (_debug_msg) printf("PARSING STRING DEFINITION [%s]\n", line);
 
 			int quote_indices[2];
 			int quotes_found = 0;
@@ -145,7 +141,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 			char* string = malloc(quote_indices[1] - quote_indices[0]);
 			strncpy(string, original_line + quote_indices[0] + 1, quote_indices[1] - quote_indices[0] - 1);
 
-			printf("STRING: %s\n", string);
+			if (_debug_msg) printf("STRING: %s\n", string);
 
 			result.operation = DEFINITION_STRING;
 			result.extra_bytes = strdup(string);
@@ -177,7 +173,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 
 		int fixed_sizes[2];
 
-		for (int i = 1; i <= space_index; i++){
+		for (int i = 1; i < space_index; i++){
 			// Clear sections
 			memset(section, 0, sizeof(section));
 			memset(section_clean, 0, sizeof(section));
@@ -188,6 +184,8 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 			removeCharacter(section_clean, '[');
 			removeCharacter(section_clean, ']');
 			
+			// printf("[%d]: %s\n", i, sections[i]);
+
 			// Check if section is size specifier
 			// bool is_size = false;
 			// for (int s = 0; s < SIZE_T_MAX; s++){
@@ -277,20 +275,17 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		// Write information about operation
 		operation |= indices << 6; // Indices
 		operation |= ((fixed_sizes[0] == -1) ? (sizeInBytes(result.value1) << 12) : ((fixed_sizes[0] - 1) << 12)); // Arg 1 size
-		operation |= ((fixed_sizes[0] == -1) ? (sizeInBytes(result.value2) << 12) : ((fixed_sizes[1] - 1) << 14)); // Arg 2 size
+		operation |= ((fixed_sizes[1] == -1) ? (sizeInBytes(result.value2) << 14) : ((fixed_sizes[1] - 1) << 14)); // Arg 2 size
+		result.operation = operation;
 
 		// printf("SIZE IN BYTES V1: %d V2: %d\n", sizeInBytes(result.value1), sizeInBytes(result.value2));
 
-		printf("OP_BITS: ");
-		printBinary(operation);
-
-		result.operation = operation;
-		// result.operation |= sizes << 16;
-
-		//SIZES: %04X sizes
-
-		printf(" OPERATION: %04X INDICES: %04X VALUE1: %08X VALUE2: %08X [LINE: %s]", result.operation & 0xFF, indices, result.value1, result.value2, line);
-		printf("\n");
+		if (_debug_msg){
+			printf("OP_BITS: ");
+			printBinary(operation);
+			printf(" OPERATION: %04X INDICES: %04X VALUE1: %08X VALUE2: %08X [LINE: %s]", result.operation & 0xFF, indices, result.value1, result.value2, line);
+			printf("\n");
+		}
 	}
 	
 	return result;

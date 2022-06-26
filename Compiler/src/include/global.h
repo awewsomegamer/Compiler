@@ -8,7 +8,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdbool.h>
 
+extern bool _debug_msg;
 extern int _line;
 extern char original_line[LINE_SIZE];
 
