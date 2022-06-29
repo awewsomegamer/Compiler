@@ -8,7 +8,7 @@
 #include <types.h>
 #include <lexer.h>
 
-bool _debug_msg = false;
+bool _debug_msg = true;
 int _line = 0;
 char original_line[LINE_SIZE];
 // char*** definitions = NULL;
@@ -63,7 +63,7 @@ void generate_assemblery(char* argv[], int i, int size){
 
 int main(int argc, char* argv[]){
 	FILE* in_file;
-	char* in_file_name = "assemblery.asm";
+	char* in_file_name;
 	bool in_file_set = false;
 
 	FILE* out_file;
@@ -73,12 +73,19 @@ int main(int argc, char* argv[]){
 	// Interpret arguments
 	for (int i = 1; i < argc; i++){
 		if (startsWith(argv[i], "-o")){
-			out_file = fopen(argv[i+1], "w");
+			out_file_name = strdup(argv[i+1]);
+			out_file = fopen(out_file_name, "w");
 			out_file_set = true;
 		}
 
 		if (startsWith(argv[i], "-i")){
-			generate_assemblery(argv, i, argc);
+			if (i+2 < argc-1 && !startsWith(argv[i+2], "-")){
+				in_file_name = "assemblery.asm";
+				generate_assemblery(argv, i, argc);
+			}else{
+				in_file_name = strdup(argv[i+1]);
+			}
+
 			in_file = fopen(in_file_name, "r");
 			in_file_set = true;
 		}
