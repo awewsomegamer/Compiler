@@ -179,7 +179,7 @@ int main(int argc, char* argv[]){
 		
 		printf("[PRE] ADDRESS: %X LINE: %s\n", address_count, line);
 
-		switch (OPERATION_T_ARGC[operation]){
+		switch (INSTRUCTION_SET[operation].argc){
 		case 0:
 			address_count++;
 			break;
@@ -272,32 +272,44 @@ int main(int argc, char* argv[]){
 	for (int i = 0; i < instruction_index; i++){
 		int operation = instructions[i].operation & 0xFF;
 
-		if (operation > ENDFILE && operation < DEFINITION_STRING){
-			fwrite(&instructions[i].operation, 2, 1, out_file);
+		switch (operation) {
+		case DEFINITION_STRING:
+			fputs(instructions[i].extra_bytes, out_file);
+			if (_debug_msg) printf("DEFINED: %s\n", instructions[i].extra_bytes);
+
+			break;
+
+		case DEFINITION_BYTES:
+			fwrite(instructions[i].extra_bytes, 1, instructions[i].value1, out_file);
+				
+			for (int j = 0; j < instructions[i].value1; j++) 
+				if (_debug_msg) printf("DEFINED BYTE: %X\n", instructions[i].extra_bytes[j]);
+
+			break;
+
+		case INCLUDE:
+			// Binary include
+			if (instructions[i].value1 == 1)
+				fwrite(instructions[i].extra_bytes, 1, instructions[i].value2, out_file);
+
+			break;
+
+		default:
+			fwrite(&instructions[i].operation, (INSTRUCTION_SET[operation].argc == 0 ? 1 : 2), 1, out_file);
 
 			uint8_t info_block = (instructions[i].operation >> 8) & 0xFF;
 			int size1 = ((info_block >> 4)& 0b11) + 1;
 			int size2 = ((info_block >> 6)& 0b11) + 1;
 
-			if (OPERATION_T_ARGC[operation] == 1 || OPERATION_T_ARGC[operation] == 2)
+			if (INSTRUCTION_SET[operation].argc == 1 || INSTRUCTION_SET[operation].argc == 2)
 				fwrite(&instructions[i].value1, size1, 1, out_file);
 
-			if (OPERATION_T_ARGC[operation] == 2)
+			if (INSTRUCTION_SET[operation].argc == 2)
 				fwrite(&instructions[i].value2, size2, 1, out_file);
 
-			if (_debug_msg) printf("WROTE: %04X (%s)\n", instructions[i].operation, OPERATION_T_NAMES[instructions[i].operation & 0xFF]);
-		}
-		
-		if (operation == DEFINITION_STRING){
-			fputs(instructions[i].extra_bytes, out_file);
-			if (_debug_msg) printf("DEFINED: %s\n", instructions[i].extra_bytes);
-		}
-		
-		if (operation == DEFINITION_BYTES){
-			fwrite(instructions[i].extra_bytes, 1, instructions[i].value1, out_file);
-				
-			for (int j = 0; j < instructions[i].value1; j++)
-				if (_debug_msg) printf("DEFINED BYTE: %X\n", instructions[i].extra_bytes[j]);
+			if (_debug_msg) printf("WROTE: %04X ARGC: %d (%s)\n", instructions[i].operation, INSTRUCTION_SET[operation].argc, INSTRUCTION_SET[operation].key);
+
+			break;
 		}
 	}
 

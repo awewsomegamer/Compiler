@@ -61,21 +61,24 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 
 		// Check operation (sections[0])
 		uint16_t operation = 0;
-		for (int i = 0; i < sizeof(OPERATION_T_NAMES)/sizeof(OPERATION_T_NAMES[0]); i++){
+		for (int i = 0; i < INSTRUCTION_MAX; i++){
 			// printf("-- %s --\n", line);
 			// printf("%s -> %s [%d, %d]\n\n", sections[0], OPERATION_T_NAMES[i], i, strcmp(sections[0], OPERATION_T_NAMES[i]));
 
-			if (strcmp(sections[0], OPERATION_T_NAMES[i]) == 0){
+			if (strcmp(sections[0], INSTRUCTION_SET[i].key) == 0){
 				operation = i;
 				
 				break;
 			}
 		}
 		
-		if (operation == INCLUDE){
+		if (strcmp(sections[0], "inc#") == 0 || strcmp(sections[0], "inc%") == 0){
 			// Include type
-			result.value1 = endsWith(sections[0], "#") ? 1 : 0; // Include type binary
-			result.value1 = endsWith(sections[0], "%") ? 2 : 0; // Include type code
+			result.operation = INCLUDE;
+			result.value1 = endsWith(sections[0], '#') ? 1 : 0; // Include type binary
+
+			if (result.value1 == 0)
+				result.value1 = endsWith(sections[0], '%') ? 2 : 0; // Include type code
 
 			char* path = malloc(strlen(line));
 			int path_i = 0;
@@ -84,11 +87,26 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 			// Parse path from quotation marks
 			for (int i = 0; i < strlen(line); i++){
 				if (*(line + i) == '"') copy = !copy;
-				if (copy) *(path + (path_i++)) = *(line + i);
+				else if (copy) *(path + (path_i++)) = *(line + i);
 			}
 
-			result.extra_bytes = strdup(path);
+			// Read in binary
+			if (result.value1 == 1){
+				printf("INCLUDING BINARY: %s\n", path);
 
+				FILE* binary;
+				binary = fopen(path, "r");
+
+				fseek(binary, 0, SEEK_END);
+				int size = ftell(binary);
+				fseek(binary, 0, SEEK_SET);
+
+				result.value2 = size;
+				result.extra_bytes = malloc(size);
+
+				fread(result.extra_bytes, 1, size, binary);
+			}
+			
 			free(path);
 
 			return result;
