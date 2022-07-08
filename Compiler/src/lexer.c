@@ -168,22 +168,27 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		if (operation == DEFINITION_STRING){
 			if (_debug_msg) printf("PARSING STRING DEFINITION [%s]\n", line);
 
-			int quote_indices[2];
+			int quote_indices[2] = {0, 0};
 			int quotes_found = 0;
 
 			for (int i = 0; i < strlen(original_line) - 1; i++)
-				if (*(original_line + i) != '\\' && *(original_line + i) == '"')
+				if (*(original_line + i) != '\\' && *(original_line + i + 1) == '"')
 					quote_indices[quotes_found++] = i;
 			
-			char* string = malloc(quote_indices[1] - quote_indices[0]);
-			strncpy(string, original_line + quote_indices[0] + 1, quote_indices[1] - quote_indices[0] - 1);
+			printf("LINE: %s I1:%d I2:%d\n", original_line, quote_indices[0], quote_indices[1]);
+
+			char string[quote_indices[1] - quote_indices[0]];
+			memset(string, 0, quote_indices[1] - quote_indices[0]);
+
+			for (int i = 0; i < quote_indices[1] - quote_indices[0] - 1; i++)
+				*(string + i) = *(original_line + i + quote_indices[0] + 2);
 
 			if (_debug_msg) printf("STRING: %s\n", string);
 
 			result.operation = DEFINITION_STRING;
 			result.extra_bytes = strdup(string);
 
-			free(string);
+			// free(string);
 
 			return result;
 		}
