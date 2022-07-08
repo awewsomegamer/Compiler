@@ -209,7 +209,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		char section[LINE_SIZE]; // Original section
 		char section_clean[LINE_SIZE]; // Removed extraneous characters
 
-		int fixed_sizes[2] = {0, 0};
+		int fixed_sizes[2] = {-1, -1};
 
 		for (int i = 1; i < space_index; i++){
 			// Clear sections
