@@ -300,20 +300,26 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 
 					switch (c){
 					case '+':
+						printf("ADD FOUND ");
 						tokens[expr_token_ptr++].type = M_ADD;
 						break;
 					case '-':
+						printf("SUB FOUND ");
 						tokens[expr_token_ptr++].type = M_SUB;
 						break;
 					case '*':
+						printf("MUL FOUND ");
 						tokens[expr_token_ptr++].type = M_MUL;
 						break;
 					case '/':
+						printf("DIV FOUND ");
 						tokens[expr_token_ptr++].type = M_DIV;
 						break;
 
 					default:
 						char name[strlen(section_clean)];
+						memset(name, 0, strlen(section_clean));
+
 						int x = 0;
 
 						while (true){
@@ -325,6 +331,8 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 							name[x++] = c_c;
 						}
 						
+						printf("FOUND LITERAL %s ", name);
+
 						tokens[expr_token_ptr].type = M_INT;
 
 						if (isNumber(name)){
@@ -342,11 +350,10 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 							// Label
 							tokens[expr_token_ptr++].value = mapGet(label_map, name).value;
 						}
-
-						// free(name);
 					}
 				}
 
+				printf("\n");
 
 				// Evaluate tokens
 				// base op value op value
@@ -355,8 +362,8 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 					if (tokens[j].type < M_INT){
 						// Math op found, preform operation on both sides and add to value
 						int rhs = tokens[j + 1].value;
-						printf("%d %d\n", value, rhs);
-
+						printf("PRE(J:%d): VALUE: %d RHS: %d OPERATION: %d\n", j, value, rhs, tokens[j].type);
+						
 						switch (tokens[j].type){
 						case M_ADD:
 							value += rhs;
@@ -371,6 +378,8 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 							value /= rhs;
 							break;
 						}
+
+						printf("POST: VALUE: %d RHS: %d OPERATION: %d\n", value, rhs, tokens[j].type);
 					}
 				}
 
