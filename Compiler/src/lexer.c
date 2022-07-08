@@ -209,7 +209,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		char section[LINE_SIZE]; // Original section
 		char section_clean[LINE_SIZE]; // Removed extraneous characters
 
-		int fixed_sizes[2];
+		int fixed_sizes[2] = {0, 0};
 
 		for (int i = 1; i < space_index; i++){
 			// Clear sections
@@ -420,7 +420,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 		if (_debug_msg){
 			printf("OP_BITS: ");
 			printBinary(operation);
-			printf(" OPERATION: %04X INDICES: %04X VALUE1: %08X VALUE2: %08X [LINE: %s]", result.operation & 0xFF, indices, result.value1, result.value2, line);
+			printf(" OPERATION: %04X INDICES: %04X VALUE1: %08X VALUE2: %08X FIXED_SIZE_1: %d FIXED_SIZE_2: %d SIZE_INB_1: %d SIZE_INB_2: %d [LINE: %s]", result.operation & 0xFF, indices, result.value1, result.value2, fixed_sizes[0], fixed_sizes[1], sizeInBytes(result.value1), sizeInBytes(result.value2), line);
 			printf("\n");
 		}
 	}
