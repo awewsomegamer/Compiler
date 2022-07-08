@@ -271,13 +271,10 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 				if (value != -1)
 					singular_index = (*section == '[' ? 3 : 0);
 			}
-
-			// If value is still not found, check label map
-			if (value == -1){
+			
+			// If value is still not found, check if it contains expression keywords if not then it is most likely a label, check label map
+			if (value == -1 && !containsCharacter(section_clean, '+') && !containsCharacter(section_clean, '-') && !containsCharacter(section_clean, '*') && !containsCharacter(section_clean, '/')){
 				HASHMAP_ELEMENT_T label = mapGet(label_map, section_clean);
-				
-				if (label.id == NULL)
-					goto LABEL_END_POINT;
 
 				// printf("LNAME %s LVAL %d\n", label.id, label.value);
 
@@ -290,11 +287,9 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 					singular_index = (*section == '[' ? 3 : 0);
 			}
 
-			LABEL_END_POINT:
-
 			// Check for expression
 			if (value == -1){
-				printf("DOING EXPRESSION\n");
+				if (_debug_msg) printf("DOING EXPRESSION\n");
 
 				// Tokenize string into tokens
 				EXPR_TOKEN_T tokens[strlen(section_clean)];

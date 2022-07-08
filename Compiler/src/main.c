@@ -10,7 +10,9 @@
 
 bool _debug_msg = true;
 int _line = 0;
-char original_line[LINE_SIZE];
+int LINE_SIZE = 0;
+char original_line[];
+
 // char*** definitions = NULL;
 // int definition_index = 0;
 
@@ -94,14 +96,23 @@ int main(int argc, char* argv[]){
 	assert(in_file_set == true);
 
 	int file_length = 0;
+	int current_line_length = 0;
 
-	while (!feof(in_file))
-		if (fgetc(in_file) == '\n')
+	while (!feof(in_file)){
+		if (fgetc(in_file) == '\n'){
+			if (LINE_SIZE < current_line_length)
+				LINE_SIZE = current_line_length;
+			
 			file_length++;
+		}
+
+		current_line_length++;
+	}
 
 	rewind(in_file);
 
 	char line[LINE_SIZE];
+	original_line[LINE_SIZE];
 
 	HASHMAP_ELEMENT_T label_map[MAX_LABELS];
 

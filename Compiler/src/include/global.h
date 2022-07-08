@@ -1,7 +1,6 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define LINE_SIZE 256
 #define MAX_LABELS 256
 
 #include <stdlib.h>
@@ -10,9 +9,10 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
+extern int LINE_SIZE;
 extern bool _debug_msg;
 extern int _line;
-extern char original_line[LINE_SIZE];
+extern char original_line[];
 
 void fatal_err(char* message, ...);
 
