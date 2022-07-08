@@ -95,6 +95,7 @@ int main(int argc, char* argv[]){
 
 	assert(in_file_set == true);
 
+	// Get the length of file in lines and the longest line
 	int file_length = 0;
 	int current_line_length = 0;
 
