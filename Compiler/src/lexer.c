@@ -175,7 +175,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 				if (*(original_line + i) != '\\' && *(original_line + i + 1) == '"')
 					quote_indices[quotes_found++] = i;
 			
-			printf("LINE: %s I1:%d I2:%d\n", original_line, quote_indices[0], quote_indices[1]);
+			if (_debug_msg) printf("LINE: %s I1:%d I2:%d\n", original_line, quote_indices[0], quote_indices[1]);
 
 			char string[quote_indices[1] - quote_indices[0]];
 			memset(string, 0, quote_indices[1] - quote_indices[0]);
