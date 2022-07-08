@@ -179,9 +179,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 
 			char string[quote_indices[1] - quote_indices[0]];
 			memset(string, 0, quote_indices[1] - quote_indices[0]);
-
-			for (int i = 0; i < quote_indices[1] - quote_indices[0] - 1; i++)
-				*(string + i) = *(original_line + i + quote_indices[0] + 2);
+			strncpy(string, original_line + quote_indices[0] + 2, quote_indices[1] - quote_indices[0] - 1);
 
 			if (_debug_msg) printf("STRING: %s\n", string);
 
