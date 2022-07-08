@@ -186,8 +186,6 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 			result.operation = DEFINITION_STRING;
 			result.extra_bytes = strdup(string);
 
-			// free(string);
-
 			return result;
 		}
 
