@@ -15,6 +15,25 @@ int indexRegister(char* name){
 	return -1;
 }
 
+// void math_get_value_string(char* string, int offset, char* ret){
+// 	memset(ret, 0, strlen(string));
+
+// 	int x = 0;
+
+// 	while (true){
+// 		char c_c = *(string + offset + x);
+		
+// 		if (c_c == '+' || c_c == '-' || c_c == '*' || c_c == '/' || c_c == ' ' || c_c == '\t')
+// 			break;
+
+// 		ret[x] = c_c;
+
+// 		x++;
+// 	}
+
+// 	printf("%s %d\n", string, offset);
+// }
+
 TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 	TOKEN_T result = {-1,0,0};
 
@@ -256,6 +275,9 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 			// If value is still not found, check label map
 			if (value == -1){
 				HASHMAP_ELEMENT_T label = mapGet(label_map, section_clean);
+				
+				if (label.id == NULL)
+					goto LABEL_END_POINT;
 
 				// printf("LNAME %s LVAL %d\n", label.id, label.value);
 
@@ -266,6 +288,98 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 				// If label is found, set the index accordingly (pointer or plain value)
 				if (value != -1)
 					singular_index = (*section == '[' ? 3 : 0);
+			}
+
+			LABEL_END_POINT:
+
+			// Check for expression
+			if (value == -1){
+				printf("DOING EXPRESSION\n");
+
+				// Tokenize string into tokens
+				EXPR_TOKEN_T tokens[strlen(section_clean)];
+				int expr_token_ptr = 0;
+				
+				for (int j = 0; j < strlen(section_clean); j++){
+					char c = *(section_clean + j);
+
+					switch (c){
+					case '+':
+						tokens[expr_token_ptr++].type = M_ADD;
+						break;
+					case '-':
+						tokens[expr_token_ptr++].type = M_SUB;
+						break;
+					case '*':
+						tokens[expr_token_ptr++].type = M_MUL;
+						break;
+					case '/':
+						tokens[expr_token_ptr++].type = M_DIV;
+						break;
+
+					default:
+						char name[strlen(section_clean)];
+						int x = 0;
+
+						while (true){
+							char c_c = *(section_clean + j + x);
+							
+							if (c_c == '+' || c_c == '-' || c_c == '*' || c_c == '/' || c_c == ' ' || c_c == '\t' || x == strlen(section_clean) - 1)
+								break;
+
+							name[x++] = c_c;
+						}
+						
+						tokens[expr_token_ptr].type = M_INT;
+
+						if (isNumber(name)){
+							// Integer
+							if (startsWith(name, "0x")){
+								// Hex string
+								tokens[expr_token_ptr++].value = strtol(name, NULL, 16);
+							} else if (startsWith(name, "0b")) {
+								// Binary
+								tokens[expr_token_ptr++].value = strtol(name, NULL, 2);
+							} else {
+								tokens[expr_token_ptr++].value = strtol(name, NULL, 10);
+							}
+						} else {
+							// Label
+							tokens[expr_token_ptr++].value = mapGet(label_map, name).value;
+						}
+
+						// free(name);
+					}
+				}
+
+
+				// Evaluate tokens
+				// base op value op value
+				value = tokens[0].value;
+				for (int j = 1; j < expr_token_ptr; j++){
+					if (tokens[j].type < M_INT){
+						// Math op found, preform operation on both sides and add to value
+						int rhs = tokens[j + 1].value;
+						printf("%d %d\n", value, rhs);
+
+						switch (tokens[j].type){
+						case M_ADD:
+							value += rhs;
+							break;
+						case M_SUB:
+							value -= rhs;
+							break;
+						case M_MUL:
+							value *= rhs;
+							break;
+						case M_DIV:
+							value /= rhs;
+							break;
+						}
+					}
+				}
+
+				if (_debug_msg) printf("EXPRESSION: %s EVALUATED TO: %d\n", section_clean, value);
 			}
 
 			// Undefined reference

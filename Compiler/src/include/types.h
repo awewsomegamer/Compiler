@@ -70,6 +70,14 @@ typedef enum {
 	ENDFILE = -1
 } OPERATION_T;
 
+typedef enum {
+	M_ADD,
+	M_SUB,
+	M_MUL,
+	M_DIV,
+	M_INT
+} MATH_OPERATION_T;
+
 
 static const struct INSTRUCTION_INFORMATION INSTRUCTION_SET[] = {
 	[NOP] 					= DEFINE_INSTRUCTION("nop",			0),
@@ -115,28 +123,10 @@ static const struct INSTRUCTION_INFORMATION INSTRUCTION_SET[] = {
 	[INCLUDE]				= DEFINE_INSTRUCTION("inc",			3)
 };
 
-// static const char* OPERATION_T_NAMES[] = {"nop", "mov", "sub", "add", 
-// 										  "div", "mul", "and", "or", 
-// 										  "xor", "not", "shl", "shr",
-// 										  "sivte", "rivte", "int", "call", 
-// 										  "jmp", "cmp", "je", "jne", "jg", 
-// 										  "jge", "jl", "jle", "jz", "jnz", 
-// 										  "jc", "jnc", "ret", "iret", "push", 
-// 										  "pop", "inb", "inw", "ind", "outb", 
-// 										  "outw", "outd", "ds", "db", "inc"};
-
-// static const uint8_t OPERATION_T_ARGC[] = {
-// 	0, 2, 2, 2,
-// 	2, 2, 2, 2,
-// 	2, 1, 2, 2,
-// 	2, 2, 1, 1,
-// 	1, 2, 1, 1, 1,
-// 	1, 1, 1, 1, 1,
-// 	1, 1, 0, 0, 1,
-// 	1, 2, 2, 2, 2,
-// 	2, 2, 3, 3, 0
-// };
-
+typedef struct{
+	int type;
+	int value;
+} EXPR_TOKEN_T;
 
 typedef struct {
 	OPERATION_T operation;
