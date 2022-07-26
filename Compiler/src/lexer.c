@@ -135,11 +135,10 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 			if (_debug_msg) printf("PARSING BYTE DEFINITION [%s]\n", line);
 
 			// db 0x0, 0xA, 0xD
-			char current_byte_string[4];
+			char current_byte_string[5];
 			int current_byte_string_idx = 0;
 			int bytes_size = 1;
 			
-
 			for (int i = 0; i < strlen(line); i++) 
 				if (*(line + i) == ',') 
 					bytes_size++;
@@ -153,7 +152,7 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 				
 				if (*(line + i) == ',' || i >= strlen(line) - 1){
 					result.extra_bytes[byte_ptr] = strtol(current_byte_string, NULL, 16);
-					if (_debug_msg) printf("BYTE: %X\n", result.extra_bytes[byte_ptr]);
+					if (_debug_msg) printf("BYTE: %X FROM: %s\n", result.extra_bytes[byte_ptr], current_byte_string);
 					byte_ptr++;
 					current_byte_string_idx = 0;
 				}
@@ -161,9 +160,12 @@ TOKEN_T tokenize(char* line, HASHMAP_ELEMENT_T label_map[]){
 
 			result.value1 = bytes_size;
 			result.operation = DEFINITION_BYTES;
-			
+
+			printf("OPERATION: %04X VALUE1: %08X VALUE2: %08X SIZE_INB_1: %d SIZE_INB_2: %d [LINE: %s]\n", result.operation & 0xFF, result.value1, result.value2, sizeInBytes(result.value1), sizeInBytes(result.value2), line);
+
 			return result;
 		}
+
 
 		if (operation == DEFINITION_STRING){
 			if (_debug_msg) printf("PARSING STRING DEFINITION [%s]\n", line);

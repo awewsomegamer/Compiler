@@ -155,6 +155,7 @@ int main(int argc, char* argv[]){
 		removeCharacter(line, '\n');
 		removeCharacter(line, '\t');
 		removeCharacter(line, ' ');
+
 		
 		int semcol_index = 0;
 		for (; semcol_index < LINE_SIZE; semcol_index++)
@@ -186,10 +187,10 @@ int main(int argc, char* argv[]){
 
 		memset((line + semcol_index), 0, (LINE_SIZE-semcol_index));
 
+		printf("[PRE] ADDRESS: %X LINE: %s\n", address_count, line);
+
 		TOKEN_T instruction = tokenize(line, label_map);
 		int operation = instruction.operation & 0xFF;
-		
-		printf("[PRE] ADDRESS: %X LINE: %s\n", address_count, line);
 
 		switch (INSTRUCTION_SET[operation].argc){
 		case 0:
@@ -269,7 +270,6 @@ int main(int argc, char* argv[]){
 
 		instructions[instruction_index++] = tokenize(line, label_map);
 	}
-
 
 	// If not out file is set, then an outfile will be generated with the in file's name + ".out"
 	if (!out_file_set){
